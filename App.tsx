@@ -67,58 +67,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Recreated Logo based on user's image (Circular Stamp Style)
-  const LogoSVG = ({ className = "" }: { className?: string }) => (
-    <svg viewBox="0 0 200 200" className={`fill-current ${className}`}>
-      <defs>
-        {/* Path for top text "UFO STUDIOS" */}
-        <path id="topCurve" d="M 25,100 A 75,75 0 0,1 175,100" />
-        {/* Path for bottom text "SINCE 1987" - drawn right to left to ensure text is upright */}
-        <path id="bottomCurve" d="M 175,100 A 75,75 0 0,1 25,100" />
-      </defs>
-
-      {/* Outer Grunge Rings */}
-      <circle cx="100" cy="100" r="98" stroke="currentColor" strokeWidth="2" fill="none" className="opacity-80" strokeDasharray="4,2" />
-      <circle cx="100" cy="100" r="92" stroke="currentColor" strokeWidth="1" fill="none" className="opacity-60" />
-
-      {/* Text on Paths */}
-      <text fill="currentColor" fontSize="22" fontFamily="monospace" fontWeight="bold" letterSpacing="4">
-        <textPath href="#topCurve" startOffset="50%" textAnchor="middle">UFO STUDIOS</textPath>
-      </text>
-      
-      <text fill="currentColor" fontSize="18" fontFamily="monospace" fontWeight="bold" letterSpacing="4">
-        <textPath href="#bottomCurve" startOffset="50%" textAnchor="middle">SINCE 1987</textPath>
-      </text>
-
-      {/* Inner Circle */}
-      <circle cx="100" cy="100" r="55" stroke="currentColor" strokeWidth="3" fill="none" />
-
-      {/* Center UFO Icon */}
-      <g transform="translate(100, 100)">
-         {/* Top Antenna */}
-         <line x1="0" y1="-35" x2="0" y2="-25" stroke="currentColor" strokeWidth="3" />
-         <circle cx="0" cy="-35" r="4" fill="currentColor" />
-         
-         {/* Dome */}
-         <path d="M -25,-5 Q 0,-35 25,-5" stroke="currentColor" strokeWidth="3" fill="none" />
-         
-         {/* Saucer Body */}
-         <ellipse cx="0" cy="0" rx="40" ry="12" fill="currentColor" />
-         
-         {/* Windows/Dots on body */}
-         <circle cx="-20" cy="0" r="2" fill="#0a0a0a" />
-         <circle cx="0" cy="2" r="2" fill="#0a0a0a" />
-         <circle cx="20" cy="0" r="2" fill="#0a0a0a" />
-
-         {/* Beams */}
-         <path d="M -15,15 L -20,40" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-         <path d="M -5,18 L -5,40" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-         <path d="M 5,18 L 5,40" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-         <path d="M 15,15 L 20,40" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-      </g>
-    </svg>
-  );
-
   return (
     <div className="bg-ufo-black min-h-screen text-ufo-offwhite selection:bg-ufo-accent selection:text-black">
       <CustomCursor />
@@ -183,9 +131,13 @@ const App: React.FC = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-dashed border-ufo-gray opacity-10 animate-[spin_40s_linear_infinite_reverse]" />
         
         <RevealOnScroll className="z-10 text-center flex flex-col items-center justify-center w-full">
-          {/* Main Hero Logo - Reduced size by 25% - White Color */}
-          <div className="w-[170px] h-[170px] md:w-[340px] md:h-[340px] text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-            <LogoSVG />
+          {/* Main Hero Logo - Image File */}
+          <div className="w-[170px] h-[170px] md:w-[340px] md:h-[340px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+            <img 
+              src="/logo.jpeg" 
+              alt="UFO Studios Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
         </RevealOnScroll>
 
@@ -374,8 +326,12 @@ const App: React.FC = () => {
           </div>
 
           <div className="text-right">
-             <div className="w-16 h-16 ml-auto mb-4 text-ufo-gray hover:text-ufo-accent transition-colors duration-500">
-               <LogoSVG />
+             <div className="w-16 h-16 ml-auto mb-4">
+               <img 
+                 src="/logo.jpeg" 
+                 alt="UFO Studios Logo" 
+                 className="w-full h-full object-contain grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition-all duration-500" 
+               />
              </div>
              <p className="font-mono text-xs text-gray-600">
                © 1987 - {new Date().getFullYear()} UFO STUDIOS CORP.<br/>
