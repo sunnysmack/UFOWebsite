@@ -134,7 +134,7 @@ const App: React.FC = () => {
           {/* Main Hero Logo - Image File */}
           <div className="w-[170px] h-[170px] md:w-[340px] md:h-[340px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
             <img 
-              src="./public/logo.jpeg" 
+              src="https://github.com/sunnysmack/UFOWebsite/blob/027a2fb50cb2d1382590d53b4e3f8263c3792b6f/88077593-6A3C-441B-9F8B-C0355B8EA794.png" 
               alt="UFO Studios Logo" 
               className="w-full h-full object-contain"
             />
@@ -314,7 +314,7 @@ const App: React.FC = () => {
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
           <div>
             <h2 className="font-sans text-3xl font-bold mb-6">SECURE CHANNEL</h2>
-            <a href="mailto:hello@ufostudios.us" className="font-mono text-xl hover:text-ufo-accent underline decoration-ufo-accent underline-offset-4 transition-colors">
+            <a href="mailto:jasoneddie@gmail.com" className="font-mono text-xl hover:text-ufo-accent underline decoration-ufo-accent underline-offset-4 transition-colors">
               hello@ufostudios.us
             </a>
             <p className="font-mono text-sm text-gray-500 mt-4">
