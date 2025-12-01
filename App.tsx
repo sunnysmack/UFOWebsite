@@ -132,7 +132,7 @@ const App: React.FC = () => {
         <div className="container mx-auto px-6 flex justify-between items-center">
           {/* Header Text - Just "UFO" in new font */}
           <a href="#" className="font-logo text-3xl tracking-tighter hover:text-ufo-accent transition-colors">
-            The UFO
+            UFO
           </a>
 
           {/* Desktop Nav */}
@@ -234,11 +234,13 @@ const App: React.FC = () => {
              {/* Text is Black for contrast against White BG */}
              <h2 className="font-sans text-5xl md:text-7xl font-bold mb-8 leading-[0.9] text-ufo-black">
                ORIGIN<br/>
-               <span className="text-transparent" style={{WebkitTextStroke: '1px #050505'}}>UNKNOWN</span>
+               <span className="text-transparent" style={{WebkitTextStroke: '1px #050505'}}>STORY</span>
              </h2>
              <div className="h-1 w-24 bg-black mb-8" />
              <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-bold">
-               Established 1987 under Project 1987-Alpha. UFO Studios is a shadowy government contractor specializing in narrative control and mass communication. We manufacture the legends the public believes.
+               Established in 1987 by 13 year old Jason Eddie Nowak, under UFO Studios is a shadowy 
+               government contractor specializing in narrative control and mass communication. 
+               We manufacture the legends the public believes.  Basically, we tell stories.  Possibly your story.
              </p>
           </RevealOnScroll>
           
@@ -259,7 +261,7 @@ const App: React.FC = () => {
                  TOP SECRET
                </div>
                <div className="absolute bottom-4 right-4 font-mono text-xs bg-black text-ufo-accent px-2 py-1 font-bold z-20">
-                 FIG. 01: THE BUNKER
+                 FIG. 01: THE BUNKER: 7002
                </div>
             </div>
             {/* Decorative corners - Black */}
@@ -369,8 +371,8 @@ const App: React.FC = () => {
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
           <div>
             <h2 className="font-sans text-3xl font-bold mb-6">SECURE CHANNEL</h2>
-            <a href="mailto:hello@ufostudios.us" className="font-mono text-xl hover:text-ufo-accent underline decoration-ufo-accent underline-offset-4 transition-colors">
-              hello@ufostudios.us
+            <a href="mailto:jasoneddie@gmail.com" className="font-mono text-xl hover:text-ufo-accent underline decoration-ufo-accent underline-offset-4 transition-colors">
+              jasoneddie@gmail.com
             </a>
             <p className="font-mono text-sm text-gray-500 mt-4">
               FIELD OFFICE:<br/>
@@ -387,7 +389,7 @@ const App: React.FC = () => {
              <p className="font-mono text-xs text-gray-600">
                © 1987 - {new Date().getFullYear()} UFO STUDIOS CORP.<br/>
                GOVERNMENT CONTRACTOR 87-X.<br/>
-               TRUST NO ONE.
+               Please Be Prepared.
              </p>
           </div>
         </div>
