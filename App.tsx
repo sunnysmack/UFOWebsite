@@ -134,7 +134,7 @@ const App: React.FC = () => {
           {/* Main Hero Logo - Image File */}
           <div className="w-[170px] h-[170px] md:w-[340px] md:h-[340px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
             <img 
-              src="https://github.com/sunnysmack/UFOWebsite/blob/027a2fb50cb2d1382590d53b4e3f8263c3792b6f/88077593-6A3C-441B-9F8B-C0355B8EA794.png" 
+              src="logo.png" 
               alt="UFO Studios Logo" 
               className="w-full h-full object-contain"
             />
