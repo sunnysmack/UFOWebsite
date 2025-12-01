@@ -338,6 +338,7 @@ const App: React.FC = () => {
         <p className="text-white-500">
             © 2024 Jason Eddie Nowak. All rights reserved.
           </p>
+        </div>
       </footer>
     </div>
   );
