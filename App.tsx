@@ -131,7 +131,7 @@ const App: React.FC = () => {
         <div className="container mx-auto px-6 flex justify-between items-center">
           {/* Header Text - Just "UFO" in new font */}
           <a href="#" className="font-logo text-3xl tracking-tighter hover:text-ufo-accent transition-colors">
-            UFO
+            The UFO
           </a>
 
           {/* Desktop Nav */}
