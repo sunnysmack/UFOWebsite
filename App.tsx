@@ -175,53 +175,37 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* HERO SECTION */}
-      <header className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
-        {/* TV Static Background */}
-        <TvStaticBackground />
-        
-        {/* Abstract Background Shapes - Now Green - Lower opacity to blend with static */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-ufo-gray opacity-10 animate-[spin_60s_linear_infinite]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-dashed border-ufo-gray opacity-10 animate-[spin_40s_linear_infinite_reverse]" />
-        
-        <RevealOnScroll className="z-10 text-center flex flex-col items-center justify-center w-full">
-          {/* Main Hero Logo - Using RollingLogo with SVG child for preview */}
-<div className="w-[75vw] h-[75vw] md:w-[340px] md:h-[340px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] mb-8">
-  <img 
-    src={logo} 
-    className="w-full h-full object-contain animate-spin md:animate-none" 
-    style={{ animationDuration: '15s' }}
-    alt="UFO Studios Logo" 
-  />
-</div>
-        </RevealOnScroll>
-
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10">
-           <div className="w-[1px] h-12 bg-gradient-to-b from-transparent to-ufo-accent animate-bounce" />
-           <span className="font-mono text-xs opacity-70 tracking-widest text-ufo-accent blink">INCOMING TRANSMISSION</span>
+     {/* Hero Section */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        {/* Background - TV Static Effect */}
+        <div className="absolute inset-0 z-0 opacity-30">
+          <TvStaticBackground />
         </div>
-      </header>
+        
+        <div className="z-10 text-center px-4 flex flex-col items-center">
+          {/* Logo Container - 75% Width on Mobile, Spinning */}
+          <div className="w-[75vw] h-[75vw] md:w-[340px] md:h-[340px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] mb-8">
+            <img 
+              src={logo} 
+              className="w-full h-full object-contain animate-spin md:animate-none" 
+              style={{ animationDuration: '15s' }}
+              alt="UFO Studios Logo" 
+            />
+          </div>
 
-      {/* MARQUEE */}
-      <div className="w-full bg-ufo-accent text-black overflow-hidden py-2 font-mono text-sm font-bold tracking-widest border-y border-ufo-black">
-        <div className="whitespace-nowrap animate-[marquee_20s_linear_infinite]">
-          THIS WAS ONLY A TEST • THIS IS ONLY A TEST • THIS WAS ONLY A TEST • THIS IS ONLY A TEST • THIS WAS ONLY A TEST • THIS IS ONLY A TEST • THIS WAS ONLY A TEST • THIS IS ONLY A TEST •
+          {/* Text Removed as requested, keeping just the transmission status */}
+          <RevealOnScroll delay={200}>
+            <p className="font-mono text-ufo-accent tracking-[0.2em] text-sm md:text-base animate-pulse">
+              INCOMING TRANSMISSION
+            </p>
+          </RevealOnScroll>
         </div>
-      </div>
 
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .blink {
-          animation: blink 1.5s infinite;
-        }
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
-        }
-      `}</style>
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50">
+          <div className="w-[1px] h-16 bg-gradient-to-b from-transparent via-ufo-accent to-transparent animate-scroll-line"></div>
+        </div>
+      </section>
 
       {/* ORIGIN (ABOUT) - Modified for White BG + Lighting Transition */}
       <section 
