@@ -135,11 +135,16 @@ const App: React.FC = () => {
           {/* Main Hero Logo - Image File */}
           <div className="w-[170px] h-[170px] md:w-[340px] md:h-[340px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
             <img 
-              src="logo.png" 
+     <img src={logo} className="logo" alt="UFO Studios Logo" />
               alt="UFO Studios Logo" 
               className="w-full h-full object-contain"
             />
           </div>
+
+
+
+
+
         </RevealOnScroll>
 
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10">
