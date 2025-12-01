@@ -281,7 +281,7 @@ const App: React.FC = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
              {[
-               { title: 'PROPAGANDA', desc: 'Social engineering and viral deployment. We control the narrative before it spreads.', num: '01' },
+               { title: 'PROPAGANDA', desc: 'Before the story breaks, we’ve already told it. Our specialty is narrative pre-emptive strike: social engineering, viral seeding, and cultural misdirection.<br><br>Social engineering and viral deployment. We control the narrative before it spreads.', num: '01' },
                { title: 'COUNTER INTEL', desc: 'Visual design that confuses, captivates, and commands attention.', num: '02' },
                { title: 'HISTORY REVISION', desc: 'Brand narrative construction. We write the past to secure your future.', num: '03' }
              ].map((service, idx) => (
@@ -310,7 +310,7 @@ const App: React.FC = () => {
         <div className="absolute inset-0 bg-ufo-accent/5" />
         <div className="container mx-auto max-w-4xl relative z-10">
           <RevealOnScroll className="text-center mb-12">
-            <h2 className="font-sans text-4xl md:text-5xl font-bold mb-4">STRATEGIC COMMAND_AI</h2>
+            <h2 className="font-sans text-4xl md:text-5xl font-bold mb-4">Timeline Decoding/Encoding</h2>
             <p className="font-mono text-sm text-gray-400">SECURE LINE ESTABLISHED... ENTER TARGET TOPIC FOR ANALYSIS.</p>
           </RevealOnScroll>
 
