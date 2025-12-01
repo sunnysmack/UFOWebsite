@@ -335,13 +335,9 @@ const App: React.FC = () => {
     alt="UFO Studios Logo" 
   />
 </div>
-             <p className="font-mono text-xs text-gray-600">
-               © 1987 - {new Date().getFullYear()} UFO STUDIOS CORP.<br/>
-               GOVERNMENT CONTRACTOR 87-X.<br/>
-               TRUST NO ONE.
-             </p>
-          </div>
-        </div>
+        <p className="text-white-500">
+            © 2024 Jason Eddie Nowak. All rights reserved.
+          </p>
       </footer>
     </div>
   );
