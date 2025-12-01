@@ -331,14 +331,13 @@ const App: React.FC = () => {
             </p>
           </div>
 
-          <div className="text-right">
-             <div className="w-16 h-16 ml-auto mb-4">
-               <img 
-                 src="/logo.jpeg" 
-                 alt="UFO Studios Logo" 
-                 className="w-full h-full object-contain grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition-all duration-500" 
-               />
-             </div>
+<div className="w-[170px] h-[170px] md:w-[340px] md:h-[340px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+  <img 
+    src={logo} 
+    className="w-full h-full object-contain" 
+    alt="UFO Studios Logo" 
+  />
+</div>
              <p className="font-mono text-xs text-gray-600">
                © 1987 - {new Date().getFullYear()} UFO STUDIOS CORP.<br/>
                GOVERNMENT CONTRACTOR 87-X.<br/>
