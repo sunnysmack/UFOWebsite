@@ -1,4 +1,4 @@
-import logo from './logo.png'
+import logo from './logo.png';
 import React, { useState, useEffect, useRef } from 'react';
 import CustomCursor from './components/CustomCursor';
 import NoiseOverlay from './components/NoiseOverlay';
