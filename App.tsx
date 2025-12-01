@@ -186,11 +186,14 @@ const App: React.FC = () => {
         
         <RevealOnScroll className="z-10 text-center flex flex-col items-center justify-center w-full">
           {/* Main Hero Logo - Using RollingLogo with SVG child for preview */}
-          <div className="w-[75vw] h-[75vw] md:w-[60vh] md:h-[60vh] max-w-[800px] max-h-[800px] drop-shadow-[0_0_25px_rgba(255,255,255,0.4)] text-white">
-            <RollingLogo className="w-full h-full">
-              <LogoSVG className="w-full h-full" />
-            </RollingLogo>
-          </div>
+<div className="w-[75vw] h-[75vw] md:w-[340px] md:h-[340px] drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] mb-8">
+  <img 
+    src={logo} 
+    className="w-full h-full object-contain animate-spin md:animate-none" 
+    style={{ animationDuration: '15s' }}
+    alt="UFO Studios Logo" 
+  />
+</div>
         </RevealOnScroll>
 
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10">
