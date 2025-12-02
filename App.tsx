@@ -8,11 +8,13 @@ import RollingLogo from './components/RollingLogo';
 import ScrambleText from './components/ScrambleText';
 import Preloader from './components/Preloader';
 import VisualThreatAssessment from './components/VisualThreatAssessment';
+import Timetruck from './components/Timetruck';
 import { NavItem } from './types';
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'CLASSIFIED', href: '#origin' },
   { label: 'OPERATIONS', href: '#services' },
+  { label: 'TIMETRUCK', href: '#timetruck' },
   { label: 'SECTOR SCAN', href: '#intelligence' },
   { label: 'COMMS', href: '#contact' }
 ];
@@ -181,7 +183,7 @@ const App: React.FC = () => {
                {/* Text is Black for contrast against White BG */}
                <div className="mb-8">
                 <ScrambleText 
-                  text="ORIGIN STORY" 
+                  text="ORIGIN STORY: 7ason.com" 
                   as="h2" 
                   className="font-sans text-5xl md:text-7xl font-bold leading-[0.9] text-ufo-black" 
                 />
@@ -189,9 +191,9 @@ const App: React.FC = () => {
                
                <div className="h-1 w-24 bg-black mb-8" />
                <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-bold">
-                 Established in 1987 by 13 year old Jason Eddie Nowak, under UFO Studios is a shadowy 
-                 government contractor specializing in narrative control and mass communication. 
-                 We manufacture the legends the public believes.  Basically, we tell stories.  Possibly your story.
+                 Established in 1987 by 13 year old Jason Eddie Nowak, UFO Studios is a shadowy 
+                 "non-government" contractor, specializing in narrative control and mass communication. 
+                Basically, we tell stories.  Possibly your story. Let's Make Up. 
                </p>
             </RevealOnScroll>
             
@@ -256,6 +258,9 @@ const App: React.FC = () => {
             </div>
           </div>
         </section>
+
+        {/* TIMETRUCK SECTION (NEW) */}
+        <Timetruck />
 
         {/* SECTOR SCAN (VISUAL THREAT ASSESSMENT) */}
         <section id="intelligence" className="py-24 px-6 relative overflow-hidden">
