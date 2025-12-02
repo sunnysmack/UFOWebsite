@@ -10,6 +10,7 @@ import Preloader from './components/Preloader';
 import VisualThreatAssessment from './components/VisualThreatAssessment';
 import Timetruck from './components/Timetruck';
 import SunnysmackAudio from './components/SunnysmackAudio';
+import { animateImage } from './services/geminiService';
 import { NavItem } from './types';
 
 const NAV_ITEMS: NavItem[] = [
@@ -34,7 +35,8 @@ const App: React.FC = () => {
   const [originState, setOriginState] = useState({
     image: '/images/IMG_0072.AVIF',
     label: 'EVIDENCE NO. 8492-X',
-    isCycling: false
+    isCycling: false, // Used for glitch effect during loading
+    videoUrl: null as string | null
   });
 
   // Helper to generate random image data
@@ -57,42 +59,97 @@ const App: React.FC = () => {
     setOriginState(prev => ({ ...prev, ...initial }));
   }, []);
 
-  // Handle Click Animation ("Live Decrypt")
-  const handleOriginClick = () => {
-    if (originState.isCycling) return;
-
-    // Haptic feedback
-    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
-
+  // Cycle animation loop (visual feedback during processing)
+  const startCycling = () => {
     setOriginState(prev => ({ ...prev, isCycling: true }));
-
-    let count = 0;
-    const maxCycles = 15; // How many images to flash
-    const speed = 80; // ms between flashes
-
     const interval = setInterval(() => {
       const min = 72;
       const max = 158;
       const num = Math.floor(Math.random() * (max - min + 1)) + min;
       const randomId = Math.floor(Math.random() * 99999).toString().padStart(5, '0');
       
-      setOriginState(prev => ({
-        ...prev,
-        image: `/images/IMG_${num.toString().padStart(4, '0')}.AVIF`,
-        label: `DECRYPTING... [${randomId}]`
-      }));
+      setOriginState(prev => {
+          return {
+            ...prev,
+            // Keep current image if we want stability, or flash through images. Flashing is cooler for "processing".
+            image: `/images/IMG_${num.toString().padStart(4, '0')}.AVIF`,
+            label: `PROCESSING... [${randomId}]`
+          };
+      });
+    }, 100);
+    return interval;
+  };
 
-      count++;
-      if (count >= maxCycles) {
-        clearInterval(interval);
-        // Settle on a final random image
-        const finalData = getRandomOriginData();
-        setOriginState({
-          ...finalData,
-          isCycling: false
-        });
-      }
-    }, speed);
+  // Handle Click Animation ("Live Decrypt / Video Gen")
+  const handleOriginClick = async () => {
+    if (originState.isCycling || originState.videoUrl) return;
+
+    // 1. Check API Key for Veo (Safer Logic)
+    try {
+        const aistudio = (window as any).aistudio;
+        if (aistudio && typeof aistudio.hasSelectedApiKey === 'function') {
+            const hasKey = await aistudio.hasSelectedApiKey();
+            if (!hasKey) {
+                if (typeof aistudio.openSelectKey === 'function') {
+                    await aistudio.openSelectKey();
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("API Key check skipped or failed", e);
+    }
+
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+
+    // 2. Start Visual Feedback
+    const cycleInterval = startCycling();
+
+    try {
+        // 3. Fetch current image as Blob -> Base64
+        const imageToAnimate = originState.image;
+        
+        const response = await fetch(imageToAnimate);
+        if (!response.ok) throw new Error("Failed to fetch image source");
+        const blob = await response.blob();
+        
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        
+        reader.onloadend = async () => {
+            try {
+                const base64 = reader.result as string;
+                
+                // 4. Call Veo API
+                const videoUrl = await animateImage(base64);
+                
+                // 5. Success
+                clearInterval(cycleInterval);
+                setOriginState(prev => ({
+                    ...prev,
+                    isCycling: false,
+                    videoUrl: videoUrl,
+                    image: imageToAnimate, // Revert to the original image so video poster matches
+                    label: 'LIVE FEED_ESTABLISHED'
+                }));
+            } catch (err) {
+                console.error("Animation generation error:", err);
+                clearInterval(cycleInterval);
+                setOriginState(prev => ({ ...prev, isCycling: false, label: 'SIGNAL LOST' }));
+            }
+        };
+
+        reader.onerror = (e) => {
+             console.error("FileReader Error", e);
+             clearInterval(cycleInterval);
+             setOriginState(prev => ({ ...prev, isCycling: false, label: 'READ ERROR' }));
+        }
+
+    } catch (e) {
+        console.error("Failed to load image for animation", e);
+        clearInterval(cycleInterval);
+        setOriginState(prev => ({ ...prev, isCycling: false, label: 'ERROR' }));
+    }
   };
 
   useEffect(() => {
@@ -311,6 +368,7 @@ const App: React.FC = () => {
                    src={originState.image} 
                    alt="Studio Interior" 
                    isActive={originState.isCycling}
+                   videoUrl={originState.videoUrl}
                    onClick={handleOriginClick}
                    // REMOVED mix-blend, contrast, and opacity filters so the component can manage its own glitch states
                    className="w-full h-full transition-all duration-700" 
@@ -327,10 +385,10 @@ const App: React.FC = () => {
                  </div>
 
                  {/* Click Hint Overlay (Only on Hover when idle) */}
-                 {!originState.isCycling && (
+                 {!originState.isCycling && !originState.videoUrl && (
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30">
                        <div className="bg-black/80 text-white font-mono text-xs px-3 py-1 border border-white/20 tracking-widest">
-                          [ CLICK TO DECRYPT ]
+                          [ CLICK TO ANIMATE ]
                        </div>
                     </div>
                  )}
