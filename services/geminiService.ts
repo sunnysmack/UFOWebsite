@@ -1,11 +1,12 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AlienResponse, ThreatAnalysisResponse } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// NOTE: We do not initialize 'ai' at the top level to avoid crashing if the API Key 
+// hasn't been injected or selected yet when the app loads.
 
-// Keep the old one just in case, or for legacy support
 export const generateAlienSlogan = async (topic: string): Promise<AlienResponse> => {
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: `Generate a marketing slogan for: ${topic}`,
@@ -36,6 +37,8 @@ export const generateAlienSlogan = async (topic: string): Promise<AlienResponse>
 
 export const analyzeSectorImage = async (base64Image: string): Promise<ThreatAnalysisResponse> => {
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
     // Remove header if present (data:image/jpeg;base64,)
     const cleanBase64 = base64Image.split(',')[1] || base64Image;
 
@@ -89,3 +92,43 @@ export const analyzeSectorImage = async (base64Image: string): Promise<ThreatAna
     throw error;
   }
 }
+
+export const animateImage = async (base64Image: string): Promise<string> => {
+  try {
+    // Initialize fresh instance to pick up latest key
+    const veoAi = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const cleanBase64 = base64Image.split(',')[1] || base64Image;
+
+    let operation = await veoAi.models.generateVideos({
+      model: 'veo-3.1-fast-generate-preview',
+      prompt: "Cinematic, slow motion animation of this scene. Bring it to life naturally. High quality, realistic.",
+      image: {
+        imageBytes: cleanBase64,
+        mimeType: 'image/jpeg', 
+      },
+      config: {
+        numberOfVideos: 1,
+        resolution: '720p',
+        aspectRatio: '9:16' // Portrait usually fits generic "photos" better than landscape for vertical crops
+      }
+    });
+
+    // Polling Loop
+    while (!operation.done) {
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Check every 5s
+      operation = await veoAi.operations.getVideosOperation({ operation: operation });
+    }
+
+    const videoUri = operation.response?.generatedVideos?.[0]?.video?.uri;
+    if (!videoUri) throw new Error("Video generation returned no URI.");
+
+    // Fetch the video content using the API key
+    const response = await fetch(`${videoUri}&key=${process.env.API_KEY}`);
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+
+  } catch (error) {
+    console.error("Animation generation failed:", error);
+    throw error;
+  }
+};
