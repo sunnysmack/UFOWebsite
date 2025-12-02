@@ -4,9 +4,17 @@ interface ParallaxImageProps {
   src: string;
   alt: string;
   className?: string;
+  isActive?: boolean; // Prop for external animation trigger
+  onClick?: () => void;
 }
 
-const ParallaxImage: React.FC<ParallaxImageProps> = ({ src, alt, className = "" }) => {
+const ParallaxImage: React.FC<ParallaxImageProps> = ({ 
+  src, 
+  alt, 
+  className = "", 
+  isActive = false,
+  onClick
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState(0);
   const [activeSrc, setActiveSrc] = useState(src);
@@ -50,7 +58,7 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({ src, alt, className = "" 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Random Glitch/Interruption Effect
+  // Random Glitch/Interruption Effect (Internal)
   useEffect(() => {
     let timeoutId: number;
 
@@ -79,19 +87,26 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({ src, alt, className = "" 
     return () => clearTimeout(timeoutId);
   }, []);
 
+  // Combine internal random glitch with external 'isActive' (rapid click cycle) state
+  const isGlitching = glitchState.active || isActive;
+
   return (
-    <div ref={containerRef} className={`overflow-hidden relative bg-black ${className}`}>
+    <div 
+      ref={containerRef} 
+      onClick={onClick}
+      className={`overflow-hidden relative bg-black ${className} ${onClick ? 'cursor-pointer' : ''}`}
+    >
       
       {/* GLITCH LAYER: CYAN (Behind) - Only visible during glitch */}
       <img 
         src={activeSrc} 
         onError={handleError}
         alt=""
-        className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-opacity duration-75 mix-blend-screen opacity-0 ${glitchState.active ? 'opacity-70' : ''}`}
+        className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-opacity duration-75 mix-blend-screen opacity-0 ${isGlitching ? 'opacity-70' : ''}`}
         style={{ 
-          transform: `translateY(${offset}px) translateX(${glitchState.shift}px)`,
+          transform: `translateY(${offset}px) translateX(${glitchState.shift + (isActive ? Math.random() * 10 - 5 : 0)}px)`,
           filter: 'sepia(100%) saturate(300%) hue-rotate(130deg)', // Cyan tint
-          clipPath: glitchState.active ? `polygon(0 ${glitchState.sliceTop}%, 100% ${glitchState.sliceTop}%, 100% ${100 - glitchState.sliceBottom}%, 0 ${100 - glitchState.sliceBottom}%)` : 'none'
+          clipPath: isGlitching ? `polygon(0 ${glitchState.sliceTop}%, 100% ${glitchState.sliceTop}%, 100% ${100 - glitchState.sliceBottom}%, 0 ${100 - glitchState.sliceBottom}%)` : 'none'
         }}
       />
 
@@ -100,9 +115,9 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({ src, alt, className = "" 
         src={activeSrc}
         onError={handleError}
         alt=""
-        className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-opacity duration-75 mix-blend-screen opacity-0 ${glitchState.active ? 'opacity-70' : ''}`}
+        className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-opacity duration-75 mix-blend-screen opacity-0 ${isGlitching ? 'opacity-70' : ''}`}
         style={{ 
-          transform: `translateY(${offset}px) translateX(${-glitchState.shift}px)`,
+          transform: `translateY(${offset}px) translateX(${-(glitchState.shift + (isActive ? Math.random() * 10 - 5 : 0))}px)`,
           filter: 'sepia(100%) saturate(300%) hue-rotate(-50deg)', // Red tint
         }}
       />
@@ -115,10 +130,12 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({ src, alt, className = "" 
         className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-all duration-100 ease-linear will-change-transform relative z-10`}
         style={{ 
           transform: `translateY(${offset}px)`,
-          // Normally Grayscale/Contrast (B&W Surveillance look), but flashes to normal color + brightness during glitch
-          filter: glitchState.active 
-            ? 'grayscale(0%) contrast(100%) brightness(1.2)' 
-            : 'grayscale(100%) contrast(125%) brightness(0.9)'
+          // If active (cycling), we invert and saturate heavily for a decoding look
+          filter: isActive 
+             ? 'invert(1) contrast(150%) saturate(0)'
+             : isGlitching 
+                ? 'grayscale(0%) contrast(100%) brightness(1.2)' 
+                : 'grayscale(100%) contrast(125%) brightness(0.9)'
         }}
       />
 
@@ -126,7 +143,7 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({ src, alt, className = "" 
       <div className="absolute inset-0 bg-ufo-accent/10 mix-blend-overlay pointer-events-none z-20" />
       
       {/* FLASH OVERLAY */}
-      <div className={`absolute inset-0 bg-white pointer-events-none z-30 mix-blend-overlay transition-opacity duration-75 ${glitchState.active ? 'opacity-20' : 'opacity-0'}`} />
+      <div className={`absolute inset-0 bg-white pointer-events-none z-30 mix-blend-overlay transition-opacity duration-75 ${isGlitching ? 'opacity-20' : 'opacity-0'}`} />
     </div>
   );
 };
