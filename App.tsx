@@ -9,12 +9,14 @@ import ScrambleText from './components/ScrambleText';
 import Preloader from './components/Preloader';
 import VisualThreatAssessment from './components/VisualThreatAssessment';
 import Timetruck from './components/Timetruck';
+import SunnysmackAudio from './components/SunnysmackAudio';
 import { NavItem } from './types';
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'CLASSIFIED', href: '#origin' },
   { label: 'OPERATIONS', href: '#services' },
   { label: 'TIMETRUCK', href: '#timetruck' },
+  { label: 'AUDIO', href: '#audio' },
   { label: 'SECTOR SCAN', href: '#intelligence' },
   { label: 'COMMS', href: '#contact' }
 ];
@@ -79,7 +81,7 @@ const App: React.FC = () => {
           <div className="container mx-auto px-6 flex justify-between items-center">
             {/* Header Text - Just "UFO" in new font */}
             <a href="#" className="font-logo text-3xl tracking-tighter hover:text-ufo-accent transition-colors">
-              THE UFO
+             THE UFO
             </a>
 
             {/* Desktop Nav */}
@@ -140,7 +142,7 @@ const App: React.FC = () => {
                   alt="UFO Studios" 
                   // mix-blend-screen handles background removal if the logo has a black background
                   // Removed drop-shadow as it can create a boxy artifact if transparency isn't perfect
-                  className="w-full h-full object-contain mix-blend-screen filter contrast-0" 
+                  className="w-full h-full object-contain mix-blend-screen filter contrast-125" 
                 />
             </RollingLogo>
           </RevealOnScroll>
@@ -183,7 +185,7 @@ const App: React.FC = () => {
                {/* Text is Black for contrast against White BG */}
                <div className="mb-8">
                 <ScrambleText 
-                  text="ORIGIN: 7ASON.COM" 
+                  text="ORIGIN STORY: 7ason.com" 
                   as="h2" 
                   className="font-sans text-5xl md:text-7xl font-bold leading-[0.9] text-ufo-black" 
                 />
@@ -191,9 +193,9 @@ const App: React.FC = () => {
                
                <div className="h-1 w-24 bg-black mb-8" />
                <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-bold">
-                 Established the of summer 1987 in the bedroom of 13 year old Jason Eddie Nowak, UFO Studios is a shadowy 
+                 Established: 1987 in the bedroom of 13 year old Jason Eddie Nowak, UFO Studios is a shadowy 
                  "non-government" contractor, specializing in narrative control and mass communication. 
-                Basically, we tell stories.  Possibly your story. Let's Make Up...Immediatley.  
+                Basically, we tell stories.  Possibly your story. Let's Make Up. 
                </p>
             </RevealOnScroll>
             
@@ -215,7 +217,7 @@ const App: React.FC = () => {
                    TOP SECRET
                  </div>
                  <div className="absolute bottom-4 right-4 font-mono text-xs bg-black text-ufo-accent px-2 py-1 font-bold z-20">
-                   FIG. 01: ART HEIST
+                   FIG. xx: ART HEIST
                  </div>
               </div>
               {/* Decorative corners - Black */}
@@ -235,9 +237,9 @@ const App: React.FC = () => {
 
             <div className="grid md:grid-cols-3 gap-8">
                {[
-                 { title: 'PROPAGANDA', desc: 'Social engineering and viral deployment. We control the narrative before it spreads. We will get your message out to the public.', num: '01' },
-                 { title: 'COUNTER INTEL', desc: 'Visual design that confuses, captivates, and commands attention. Your enemies are also ours.', num: '02' },
-                 { title: 'HISTORY REVISION', desc: 'Brand narrative construction. We will help write your future. ', num: '03' }
+                 { title: 'PROPAGANDA', desc: 'Social engineering and viral deployment. We control the narrative before it spreads.', num: '01' },
+                 { title: 'COUNTER INTEL', desc: 'Visual design that confuses, captivates, and commands attention.', num: '02' },
+                 { title: 'HISTORY REVISION', desc: 'Brand narrative construction. We write the past to secure your future.', num: '03' }
                ].map((service, idx) => (
                  <RevealOnScroll key={idx} delay={idx * 150} threshold={0.2}>
                    <div className="group border border-ufo-gray p-8 hover:bg-ufo-gray/10 hover:border-ufo-accent transition-all duration-300 h-full flex flex-col justify-between min-h-[300px] relative overflow-hidden">
@@ -259,8 +261,11 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* TIMETRUCK SECTION (NEW) */}
+        {/* TIMETRUCK SECTION */}
         <Timetruck />
+        
+        {/* AUDIO / SUNNYSMACK SECTION (NEW) */}
+        <SunnysmackAudio />
 
         {/* SECTOR SCAN (VISUAL THREAT ASSESSMENT) */}
         <section id="intelligence" className="py-24 px-6 relative overflow-hidden">
@@ -268,7 +273,7 @@ const App: React.FC = () => {
           <div className="container mx-auto max-w-4xl relative z-10">
             <RevealOnScroll className="text-center mb-12">
               <ScrambleText text="SECTOR SCAN" as="h2" className="font-sans text-4xl md:text-5xl font-bold mb-4" />
-              <p className="font-mono text-sm text-gray-400">UPLOAD VISUAL TELEMETRY. IDENTIFY HIDDEN TIMELINE THREATS.</p>
+              <p className="font-mono text-sm text-gray-400">UPLOAD VISUAL TELEMETRY. IDENTIFY HIDDEN THREATS.</p>
             </RevealOnScroll>
 
             <VisualThreatAssessment />
