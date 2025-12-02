@@ -40,7 +40,7 @@ const ALBUMS = [
     type: "LP",
     duration: "01:01:00",
     color: "from-rose-900 to-pink-900",
-    tracks: ["Valentine", "Geronimo", "Now Everybody Knows", "Quicksand", "Mezzanine", "Sara's in Slow Motion", "Seven", "Moviestar (feat. Atmosphere)", "Seven", "Moviestar", "Tom Courtenay", "Red Tattoo (feat. Ant)", "Isn't It Wonderful?", "The Spaceship", "It's On", "Giant" ],
+    tracks: ["Valentine", "Geronimo", "Now Everybody Knows", "Quicksand", "Mezzanine", "Sara's in Slow Motion", "Seven", "Moviestar (feat. Atmosphere)", "Seven", "Moviestar", "Tom Courtenay", "Red Tattoo", "Isn't It Wonderful?", "The Spaceship", "It's On", "Giant" ],
     link: "https://open.spotify.com/artist/sunnysmack",
     cover: "/images/album3.jpg"
   },
@@ -50,7 +50,7 @@ const ALBUMS = [
     type: "LP",
     duration: "01:04:00",
     color: "from-cyan-900 to-blue-900",
-    tracks: [""],
+    tracks: ["Lili", "Go to Austin", "Paisley", "Being Blue", "My Favorite Color", "Pavement", "Your Plastic Allision", "Song for the Trams", "Carousel", "Kangaroo", "Bonified Geek", "It's Nice That You Exist", "Hondulay", "Insturmental"],
     link: "https://open.spotify.com/artist/sunnysmack",
     cover: "/images/album2.jpg"
   },
@@ -60,7 +60,7 @@ const ALBUMS = [
     type: "LP",
     duration: "01:14:00",
     color: "from-gray-800 to-gray-900",
-    tracks: [""],
+    tracks: ["Song for the Trams", "Lavita", "Girl", "I Don't Care About the Weather", "Parachute", "Silver", "Johnny Appleseed", "Dezaline", "Second Act Suicide", "Charlie Chan", "Troubador", "Outerspace", "Pineapple"],
     link: "https://open.spotify.com/artist/sunnysmack",
     cover: "/images/album1.jpg"
   }
