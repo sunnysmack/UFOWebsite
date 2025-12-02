@@ -22,6 +22,13 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'COMMS', href: '#contact' }
 ];
 
+const SERVICES = [
+    { num: '001', title: 'MEMETIC WARFARE', desc: 'Deploying viral thought-forms to destabilize consensus reality.' },
+    { num: '002', title: 'TEMPORAL INSERTION', desc: 'Retroactive continuity adjustments for timeline preservation.' },
+    { num: '003', title: 'SIGNAL INTELLIGENCE', desc: 'Decryption of interstellar static and void transmissions.' },
+    { num: '004', title: 'BIOLOGICAL MIMICRY', desc: 'Advanced synthesis of organic camouflage for field agents.' }
+];
+
 // Interactive Service Card Component
 const ServiceItem = ({ service, index }: { service: any, index: number }) => {
   const [active, setActive] = useState(false);
@@ -284,7 +291,7 @@ const App: React.FC = () => {
           {/* TV Static Background */}
           <TvStaticBackground />
           
-          {/* Abstract Background Shapes - Now Gold - Lower opacity to blend with static */}
+          {/* Abstract Background Shapes */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-ufo-gray opacity-[0.05] animate-[spin_60s_linear_infinite]" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-dashed border-ufo-gray opacity-[0.05] animate-[spin_40s_linear_infinite_reverse]" />
           
@@ -295,7 +302,6 @@ const App: React.FC = () => {
                    {/* Subtle back glow to integrate with background */}
                    <div className="absolute inset-0 bg-ufo-accent/5 rounded-full blur-2xl animate-pulse-slow" />
                    
-                   {/* REVERTED TO IMAGE AS REQUESTED */}
                    <img 
                      src="/images/logo.png" 
                      alt="UFO Studios" 
@@ -361,4 +367,104 @@ const App: React.FC = () => {
                </div>
                
                <div className="h-1 w-24 bg-black mb-8" />
-               <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-
+               <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-bold mb-8">
+                 WE ARE THE SIGNAL IN THE STATIC.
+               </p>
+               <p className="font-mono text-sm text-black/60 leading-relaxed max-w-lg mb-8">
+                 UFO Studios is an independent creative outpost transmitting from an undisclosed location. We specialize in sonic weaponry, visual anomalies, and temporal distortion.
+               </p>
+
+               {/* Easter Egg Trigger */}
+               <button 
+                onClick={handleEasterEgg}
+                className="font-mono text-xs tracking-widest text-black/40 hover:text-red-500 transition-colors uppercase border border-black/10 px-4 py-2 hover:border-red-500"
+               >
+                 [ DO NOT CLICK ]
+               </button>
+            </RevealOnScroll>
+
+            {/* FILM STRIP / PARALLAX IMAGE COMPONENT */}
+            <div className="relative h-[600px] w-full">
+               <div className="absolute -top-6 left-0 z-20 bg-black text-white px-2 py-1 font-mono text-xs tracking-widest flex items-center gap-2">
+                 <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                 {currentEvidenceLabel}
+               </div>
+
+               <ParallaxImage 
+                 items={reelItems} 
+                 className="h-full w-full border-4 border-black shadow-[10px_10px_0px_rgba(0,0,0,0.2)]"
+                 onIndexChange={handleReelChange}
+                 onImageClick={(img) => setFullscreenImage(img)}
+               />
+               
+               {/* Decorative "Tape" */}
+               <div className="absolute -bottom-4 -right-4 w-32 h-8 bg-yellow-400 opacity-80 transform -rotate-3 z-30" />
+            </div>
+          </div>
+        </section>
+
+        {/* SERVICES */}
+        <section id="services" className="py-24 bg-ufo-black border-t border-ufo-gray/30">
+          <div className="container mx-auto px-6">
+            <RevealOnScroll className="mb-16">
+              <ScrambleText text="OPERATIONS" as="h2" className="font-sans text-4xl md:text-6xl font-bold text-white mb-4" />
+              <div className="w-full h-[1px] bg-ufo-gray opacity-30" />
+            </RevealOnScroll>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {SERVICES.map((service, idx) => (
+                <ServiceItem key={idx} service={service} index={idx} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* TIMETRUCK */}
+        <Timetruck />
+
+        {/* AUDIO */}
+        <SunnysmackAudio />
+
+        {/* INTELLIGENCE / SCAN */}
+        <section id="intelligence" className="py-24 bg-[#050505] relative overflow-hidden">
+           <div className="container mx-auto px-6 relative z-10">
+              <RevealOnScroll className="text-center mb-16">
+                 <ScrambleText text="SECTOR SCAN" as="h2" className="font-sans text-4xl md:text-6xl font-bold text-white mb-2" />
+                 <p className="font-mono text-ufo-accent text-sm tracking-widest">VISUAL THREAT ASSESSMENT SYSTEM</p>
+              </RevealOnScroll>
+              
+              <VisualThreatAssessment />
+           </div>
+        </section>
+
+        {/* FOOTER / CONTACT */}
+        <footer id="contact" className="bg-black py-20 border-t border-ufo-gray/20 text-center">
+           <div className="container mx-auto px-6">
+              <RevealOnScroll>
+                <div className="mb-8">
+                  <h3 className="font-logo text-5xl text-ufo-offwhite mb-2">THE UFO</h3>
+                  <p className="font-mono text-xs text-gray-500 tracking-[0.2em]">EST. 1947 • SECTOR 7G</p>
+                </div>
+                
+                <div className="flex justify-center gap-8 mb-12">
+                   {['INSTAGRAM', 'TWITTER', 'BANDCAMP', 'EMAIL'].map((link) => (
+                     <a key={link} href="#" className="font-mono text-xs text-ufo-accent hover:text-white transition-colors">
+                       {link}
+                     </a>
+                   ))}
+                </div>
+
+                <p className="font-mono text-[10px] text-gray-700">
+                  © {new Date().getFullYear()} UFO STUDIOS. ALL RIGHTS RESERVED. <br/>
+                  UNAUTHORIZED REPRODUCTION WILL RESULT IN IMMEDIATE ABDUCTION.
+                </p>
+              </RevealOnScroll>
+           </div>
+        </footer>
+
+      </div>
+    </>
+  );
+};
+
+export default App;
