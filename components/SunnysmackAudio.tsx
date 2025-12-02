@@ -5,64 +5,64 @@ import ScrambleText from './ScrambleText';
 // Mock Data - Add your image paths to the 'cover' property
 const ALBUMS = [
   {
-    title: "FREQUENCY_ZERO",
-    year: "2024",
+    title: "The Maneuvers",
+    year: "2026",
     type: "LP",
-    duration: "42:15",
+    duration: "13:13",
     color: "from-purple-900 to-blue-900",
-    tracks: ["Static Dawn", "Neon Veins", "Zero Point"],
+    tracks: ["Escalators", "Meet the Band"],
     link: "https://open.spotify.com/artist/sunnysmack",
-    cover: "" // e.g., "/images/frequency_zero.jpg"
+    cover: "/images/album6.jpg" // e.g., "/images/frequency_zero.jpg"
   },
   {
-    title: "ANALOG_GHOSTS",
-    year: "2023",
-    type: "EP",
-    duration: "18:30",
-    color: "from-red-900 to-orange-900",
-    tracks: ["Haunt", "Poltergeist", "Exorcism_V2"],
-    link: "https://open.spotify.com/artist/sunnysmack",
-    cover: ""
-  },
-  {
-    title: "VOID_RUNNER",
-    year: "2022",
-    type: "SINGLE",
-    duration: "04:20",
-    color: "from-emerald-900 to-teal-900",
-    tracks: ["Void Runner (Original Mix)"],
-    link: "https://open.spotify.com/artist/sunnysmack",
-    cover: ""
-  },
-  {
-    title: "SYSTEM_CRASH_V1",
-    year: "2021",
-    type: "EP",
-    duration: "22:10",
-    color: "from-rose-900 to-pink-900",
-    tracks: ["Kernel Panic", "Fatal Exception", "Force Quit"],
-    link: "https://open.spotify.com/artist/sunnysmack",
-    cover: ""
-  },
-  {
-    title: "DEEP_WEB_DIVING",
+    title: "I Don't Mind Myself, Sometimes.",
     year: "2020",
-    type: "LP",
-    duration: "38:45",
-    color: "from-cyan-900 to-blue-900",
-    tracks: ["Onion Router", "Encrypted Walls", "Bitcoin Assassin"],
+    type: "EP",
+    duration: "28:00",
+    color: "from-red-900 to-orange-900",
+    tracks: ["The Wedding Song", "Lili", "Kangaroo", "Geronimo", "My Favorite Color", "Sara's in Slow Motion", "Now Everybody Knows", "Giant"],
     link: "https://open.spotify.com/artist/sunnysmack",
-    cover: ""
+    cover: "/images/album5.jpg"
   },
   {
-    title: "SIGNAL_LOSS",
-    year: "2019",
-    type: "SINGLE",
-    duration: "03:33",
-    color: "from-gray-800 to-gray-900",
-    tracks: ["White Noise", "Static (Reprise)"],
+    title: "The Colors Hit The Ground",
+    year: "2017",
+    type: "EP,
+    duration: "14:00",
+    color: "from-emerald-900 to-teal-900",
+    tracks: ["The Wedding Song", "Telescopes", "Snow Like Medicine", "Sleepyhead"],
     link: "https://open.spotify.com/artist/sunnysmack",
-    cover: ""
+    cover: "/images/album4.jpg"
+  },
+  {
+    title: "The Mezzanine Girls",
+    year: "2005",
+    type: "LP",
+    duration: "01:01:00",
+    color: "from-rose-900 to-pink-900",
+    tracks: ["Valentine", "Geronimo", "Now Everybody Knows", "Quicksand", "Mezzanine", "Sara's in Slow Motion", "Seven", "Moviestar (feat. Atmosphere)", "Seven", "Moviestar", "Tom Courtenay", "Red Tattoo (feat. Ant)", "Isn't It Wonderful?", "The Spaceship", "It's On", "Giant" ],
+    link: "https://open.spotify.com/artist/sunnysmack",
+    cover: "/images/album3.jpg"
+  },
+  {
+    title: "A Soundtrack for Sara",
+    year: "2000",
+    type: "LP",
+    duration: "01:04:00",
+    color: "from-cyan-900 to-blue-900",
+    tracks: [""],
+    link: "https://open.spotify.com/artist/sunnysmack",
+    cover: "/images/album2.jpg"
+  },
+  {
+    title: "Watching Stanley",
+    year: "1997",
+    type: "LP",
+    duration: "01:14:00",
+    color: "from-gray-800 to-gray-900",
+    tracks: [""],
+    link: "https://open.spotify.com/artist/sunnysmack",
+    cover: "/images/album1.jpg"
   }
 ];
 
