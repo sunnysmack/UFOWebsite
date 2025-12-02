@@ -30,13 +30,70 @@ const App: React.FC = () => {
   const originRef = useRef<HTMLDivElement>(null);
   const [originVisible, setOriginVisible] = useState(false);
 
-  // Random Image Logic: Selects a random image from IMG_0072.AVIF to IMG_0158.AVIF
-  const [originImage] = useState(() => {
+  // --- ORIGIN SECTION LOGIC ---
+  const [originState, setOriginState] = useState({
+    image: '/images/IMG_0072.AVIF',
+    label: 'EVIDENCE NO. 8492-X',
+    isCycling: false
+  });
+
+  // Helper to generate random image data
+  const getRandomOriginData = () => {
     const min = 72;
     const max = 158;
     const num = Math.floor(Math.random() * (max - min + 1)) + min;
-    return `/images/IMG_${num.toString().padStart(4, '0')}.AVIF`;
-  });
+    const randomId = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const randomSector = ['A', 'B', 'X', '9', 'Z', 'Q'][Math.floor(Math.random() * 6)];
+    
+    return {
+      image: `/images/IMG_${num.toString().padStart(4, '0')}.AVIF`,
+      label: `EVIDENCE NO. ${randomId}-${randomSector}`
+    };
+  };
+
+  // Set initial random image on mount
+  useEffect(() => {
+    const initial = getRandomOriginData();
+    setOriginState(prev => ({ ...prev, ...initial }));
+  }, []);
+
+  // Handle Click Animation ("Live Decrypt")
+  const handleOriginClick = () => {
+    if (originState.isCycling) return;
+
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+
+    setOriginState(prev => ({ ...prev, isCycling: true }));
+
+    let count = 0;
+    const maxCycles = 15; // How many images to flash
+    const speed = 80; // ms between flashes
+
+    const interval = setInterval(() => {
+      const min = 72;
+      const max = 158;
+      const num = Math.floor(Math.random() * (max - min + 1)) + min;
+      const randomId = Math.floor(Math.random() * 99999).toString().padStart(5, '0');
+      
+      setOriginState(prev => ({
+        ...prev,
+        image: `/images/IMG_${num.toString().padStart(4, '0')}.AVIF`,
+        label: `DECRYPTING... [${randomId}]`
+      }));
+
+      count++;
+      if (count >= maxCycles) {
+        clearInterval(interval);
+        // Settle on a final random image
+        const finalData = getRandomOriginData();
+        setOriginState({
+          ...finalData,
+          isCycling: false
+        });
+      }
+    }, speed);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -243,13 +300,18 @@ const App: React.FC = () => {
                </p>
             </RevealOnScroll>
             
-            <RevealOnScroll delay={200} className="relative group">
+            <RevealOnScroll delay={200} className="relative group select-none">
               {/* Image Border darkened for contrast */}
-              <div className="aspect-square border border-black relative overflow-hidden bg-black rounded-sm shadow-[10px_10px_0px_rgba(0,0,0,0.2)]">
+              <div 
+                className="aspect-square border border-black relative overflow-hidden bg-black rounded-sm shadow-[10px_10px_0px_rgba(0,0,0,0.2)] cursor-pointer group-hover:shadow-[15px_15px_0px_rgba(0,0,0,0.2)] transition-shadow duration-300"
+                onClick={handleOriginClick}
+              >
                  {/* New Parallax Component using random image */}
                  <ParallaxImage 
-                   src={originImage} 
+                   src={originState.image} 
                    alt="Studio Interior" 
+                   isActive={originState.isCycling}
+                   onClick={handleOriginClick}
                    // REMOVED mix-blend, contrast, and opacity filters so the component can manage its own glitch states
                    className="w-full h-full transition-all duration-700" 
                  />
@@ -260,9 +322,18 @@ const App: React.FC = () => {
                  <div className="absolute top-4 left-4 border border-black text-black px-2 py-1 font-mono text-xs tracking-widest z-20 bg-ufo-accent/80 backdrop-blur-sm">
                    TOP SECRET
                  </div>
-                 <div className="absolute bottom-4 right-4 font-mono text-xs bg-black text-ufo-accent px-2 py-1 font-bold z-20">
-                   FIG. XX: ART HEIST
+                 <div className={`absolute bottom-4 right-4 font-mono text-xs bg-black px-2 py-1 font-bold z-20 transition-colors duration-100 ${originState.isCycling ? 'text-red-500 bg-black' : 'text-ufo-accent'}`}>
+                   {originState.label}
                  </div>
+
+                 {/* Click Hint Overlay (Only on Hover when idle) */}
+                 {!originState.isCycling && (
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30">
+                       <div className="bg-black/80 text-white font-mono text-xs px-3 py-1 border border-white/20 tracking-widest">
+                          [ CLICK TO DECRYPT ]
+                       </div>
+                    </div>
+                 )}
               </div>
               {/* Decorative corners - Black */}
               <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-black" />
