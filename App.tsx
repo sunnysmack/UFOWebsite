@@ -81,9 +81,9 @@ const ServiceItem = ({ service, index }: { service: any, index: number }) => {
            <div className="w-2 h-2 bg-ufo-accent rounded-full animate-ping" />
          </div>
 
-         {/* Active Static Effect - Removed Overlay Container */}
+         {/* Active Static Effect */}
          {active && (
-            <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
+            <div className="absolute inset-0 z-30 opacity-80 pointer-events-none mix-blend-screen">
                 <TvStaticBackground />
             </div>
          )}
