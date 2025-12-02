@@ -101,6 +101,9 @@ const GlitchImage: React.FC<{ src: string; alt: string; isActive: boolean }> = (
             }}
             loading="lazy"
         />
+
+        {/* Permanent TV Scanlines Overlay */}
+        <div className="absolute inset-0 pointer-events-none z-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.4)_50%)] bg-[length:100%_4px]" />
       </div>
   );
 };
@@ -163,8 +166,6 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({
              
              {/* Vignette per frame */}
              <div className="absolute inset-0 bg-[radial-gradient(circle,transparent_60%,#000_100%)] pointer-events-none" />
-             
-             {/* REMOVED HOVER HINT OVERLAY */}
           </div>
         ))}
       </div>
