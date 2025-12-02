@@ -100,7 +100,7 @@ const App: React.FC = () => {
 
             {/* Mobile Menu Button */}
             <button 
-              className="md:hidden text-ufo-offwhite hover:text-ufo-accent transition-colors font-mono"
+              className="md:hidden text-ufo-offwhite hover:text-ufo-accent transition-colors font-mono relative z-50"
               onClick={toggleMenu}
             >
               {menuOpen ? '[ CLOSE ]' : '[ MENU ]'}
@@ -110,18 +110,48 @@ const App: React.FC = () => {
 
         {/* Mobile Menu Overlay */}
         {menuOpen && (
-          <div className="fixed inset-0 z-30 bg-ufo-black/95 backdrop-blur-md flex flex-col justify-center items-center gap-8 md:hidden">
-            {NAV_ITEMS.map((item) => (
-              <a 
-                key={item.label}
-                href={item.href}
-                onClick={() => setMenuOpen(false)}
-                className="font-sans text-4xl font-bold hover:text-ufo-accent glitch-text"
-                data-text={item.label}
-              >
-                {item.label}
-              </a>
-            ))}
+          <div className="fixed inset-0 z-30 bg-black flex flex-col justify-center md:hidden">
+             {/* Animation Keyframes */}
+             <style>{`
+                @keyframes slideUpFade {
+                  from { opacity: 0; transform: translateY(20px); }
+                  to { opacity: 1; transform: translateY(0); }
+                }
+                .nav-item-enter {
+                  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                }
+             `}</style>
+             
+             {/* Background Grid */}
+             <div className="absolute inset-0 bg-[linear-gradient(rgba(30,30,30,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(30,30,30,0.5)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none opacity-20" />
+
+             <div className="flex flex-col w-full px-8 relative z-10">
+                {NAV_ITEMS.map((item, idx) => (
+                  <a 
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="nav-item-enter group flex items-center justify-between border-b border-gray-800/50 py-5"
+                    style={{ animationDelay: `${idx * 100}ms`, opacity: 0 }}
+                  >
+                    <div className="flex items-baseline gap-4">
+                       <span className="font-mono text-xs text-ufo-accent/50 group-hover:text-ufo-accent transition-colors">0{idx + 1}</span>
+                       <span className="font-sans text-3xl font-bold text-white group-hover:text-ufo-accent transition-colors tracking-tight">
+                        {item.label}
+                       </span>
+                    </div>
+                    <span className="text-ufo-accent opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-4 group-hover:translate-x-0 duration-300">
+                       &gt;
+                    </span>
+                  </a>
+                ))}
+             </div>
+             
+             <div className="absolute bottom-10 left-0 w-full text-center nav-item-enter" style={{ animationDelay: '600ms', opacity: 0 }}>
+                <p className="font-mono text-[10px] text-gray-600 uppercase tracking-widest">
+                  UFO STUDIOS /// MOBILE UPLINK
+                </p>
+             </div>
           </div>
         )}
 
@@ -183,7 +213,7 @@ const App: React.FC = () => {
                {/* Text is Black for contrast against White BG */}
                <div className="mb-8">
                 <ScrambleText 
-                  text="ORIGINS: 7ASON" 
+                  text="ORIGIN STORY: 7ason.com" 
                   as="h2" 
                   className="font-sans text-5xl md:text-7xl font-bold leading-[0.9] text-ufo-black" 
                 />
