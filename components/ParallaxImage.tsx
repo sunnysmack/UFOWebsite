@@ -152,11 +152,10 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({
                 className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-all duration-100 ease-linear will-change-transform relative z-10`}
                 style={{ 
                 transform: `translateY(${offset}px)`,
-                // If active (cycling), we invert and saturate heavily for a decoding look
-                filter: isActive 
-                    ? 'invert(1) contrast(150%) saturate(0)'
-                    : isGlitching 
-                        ? 'grayscale(0%) contrast(100%) brightness(1.2)' 
+                // Removed the invert/saturate filter when isActive.
+                // It now just looks slightly brighter/glitchy via the glitch layers above.
+                filter: isGlitching 
+                        ? 'grayscale(0%) contrast(100%) brightness(1.1)' 
                         : 'grayscale(100%) contrast(125%) brightness(0.9)'
                 }}
             />
