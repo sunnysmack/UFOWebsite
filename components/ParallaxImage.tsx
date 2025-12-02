@@ -7,6 +7,7 @@ interface ParallaxImageProps {
   isActive?: boolean; // Prop for external animation trigger
   videoUrl?: string | null; // New prop for animated video content
   onClick?: () => void;
+  onError?: (fallbackSrc: string) => void; // Notify parent of error
 }
 
 const ParallaxImage: React.FC<ParallaxImageProps> = ({ 
@@ -15,7 +16,8 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({
   className = "", 
   isActive = false,
   videoUrl = null,
-  onClick
+  onClick,
+  onError
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState(0);
@@ -34,10 +36,11 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({
 
   // Fallback handler for broken random images
   const handleError = () => {
+    const fallback = '/images/IMG_0072.AVIF';
     // If the random image fails, try loading the first image in the series as a fallback.
-    // We check to avoid an infinite loop if 0072 is also missing.
-    if (activeSrc !== '/images/IMG_0072.AVIF') {
-       setActiveSrc('/images/IMG_0072.AVIF');
+    if (activeSrc !== fallback) {
+       setActiveSrc(fallback);
+       if (onError) onError(fallback);
     }
   };
 
