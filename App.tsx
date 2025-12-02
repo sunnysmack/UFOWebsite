@@ -77,7 +77,7 @@ const App: React.FC = () => {
           <div className="container mx-auto px-6 flex justify-between items-center">
             {/* Header Text - Just "UFO" in new font */}
             <a href="#" className="font-logo text-3xl tracking-tighter hover:text-ufo-accent transition-colors">
-              UFO
+              THE UFO
             </a>
 
             {/* Desktop Nav */}
@@ -188,9 +188,9 @@ const App: React.FC = () => {
                
                <div className="h-1 w-24 bg-black mb-8" />
                <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-bold">
-                 Established in 1987 by 13 year old Jason Eddie Nowak, under UFO Studios is a shadowy 
-                 government contractor specializing in narrative control and mass communication. 
-                 We manufacture the legends the public believes.  Basically, we tell stories.  Possibly your story.
+                 Established in 1987 by 13 year old Jason Eddie Nowak,UFO Studios is a shadowy 
+                 non-government contractor specializing in narrative control and mass communication. 
+                Basically, we tell stories.  Possibly your story.  We make things up.
                </p>
             </RevealOnScroll>
             
@@ -212,7 +212,7 @@ const App: React.FC = () => {
                    TOP SECRET
                  </div>
                  <div className="absolute bottom-4 right-4 font-mono text-xs bg-black text-ufo-accent px-2 py-1 font-bold z-20">
-                   FIG. 01: THE BUNKER: 7002
+                   FIG. 01: ART HEIST
                  </div>
               </div>
               {/* Decorative corners - Black */}
