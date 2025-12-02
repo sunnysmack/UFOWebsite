@@ -176,12 +176,12 @@ const App: React.FC = () => {
       {/* Fullscreen Image Modal */}
       {fullscreenImage && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/98 flex flex-col items-center justify-center p-4 animate-in fade-in duration-300"
+          className="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center p-4 animate-in fade-in duration-300"
           onClick={closeFullscreen}
         >
-           {/* Image Container - Warm White Glow added here */}
+           {/* Image Container - Warm White Glow added here - Opacity 100% background above */}
            <div 
-             className="relative max-w-full max-h-[70vh] shadow-[0_0_100px_rgba(255,220,180,0.4)] rounded-sm transition-all duration-500" 
+             className="relative max-w-full max-h-[70vh] shadow-[0_0_120px_rgba(255,220,180,0.5)] rounded-sm transition-all duration-500" 
              onClick={(e) => e.stopPropagation()}
            >
                 <img 
@@ -384,21 +384,24 @@ const App: React.FC = () => {
             </RevealOnScroll>
 
             {/* FILM STRIP / PARALLAX IMAGE COMPONENT */}
-            <div className="relative h-[600px] w-full">
-               <div className="absolute -top-6 left-0 z-20 bg-black text-white px-2 py-1 font-mono text-xs tracking-widest flex items-center gap-2">
-                 <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                 {currentEvidenceLabel}
-               </div>
+            <div className="relative w-full max-w-sm mx-auto">
+               <div className="aspect-square relative border-4 border-black shadow-[10px_10px_0px_rgba(0,0,0,0.2)]">
+                  {/* Label */}
+                   <div className="absolute -top-6 left-0 z-20 bg-black text-white px-2 py-1 font-mono text-xs tracking-widest flex items-center gap-2">
+                     <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                     {currentEvidenceLabel}
+                   </div>
 
-               <ParallaxImage 
-                 items={reelItems} 
-                 className="h-full w-full border-4 border-black shadow-[10px_10px_0px_rgba(0,0,0,0.2)]"
-                 onIndexChange={handleReelChange}
-                 onImageClick={(img) => setFullscreenImage(img)}
-               />
-               
-               {/* Decorative "Tape" */}
-               <div className="absolute -bottom-4 -right-4 w-32 h-8 bg-yellow-400 opacity-80 transform -rotate-3 z-30" />
+                   <ParallaxImage 
+                     items={reelItems} 
+                     className="h-full w-full"
+                     onIndexChange={handleReelChange}
+                     onImageClick={(img) => setFullscreenImage(img)}
+                   />
+                   
+                   {/* Decorative "Tape" */}
+                   <div className="absolute -bottom-4 -right-4 w-32 h-8 bg-yellow-400 opacity-80 transform -rotate-3 z-30 shadow-sm" />
+               </div>
             </div>
           </div>
         </section>
@@ -437,29 +440,40 @@ const App: React.FC = () => {
            </div>
         </section>
 
-        {/* FOOTER / CONTACT */}
-        <footer id="contact" className="bg-black py-20 border-t border-ufo-gray/20 text-center">
-           <div className="container mx-auto px-6">
-              <RevealOnScroll>
-                <div className="mb-8">
-                  <h3 className="font-logo text-5xl text-ufo-offwhite mb-2">THE UFO</h3>
-                  <p className="font-mono text-xs text-gray-500 tracking-[0.2em]">EST. 1947 • SECTOR 7G</p>
-                </div>
-                
-                <div className="flex justify-center gap-8 mb-12">
-                   {['INSTAGRAM', 'TWITTER', 'BANDCAMP', 'EMAIL'].map((link) => (
-                     <a key={link} href="#" className="font-mono text-xs text-ufo-accent hover:text-white transition-colors">
-                       {link}
-                     </a>
-                   ))}
-                </div>
+        {/* FOOTER */}
+        <footer id="contact" className="bg-black py-20 px-6 border-t border-ufo-gray/30">
+          <div className="container mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
+            <div>
+              <h2 className="font-sans text-3xl font-bold mb-6">SECURE CHANNEL</h2>
+              <a href="mailto:jasoneddie@gmail.com" className="font-mono text-xl hover:text-ufo-accent underline decoration-ufo-accent underline-offset-4 transition-colors">
+                jasoneddie@gmail.com
+              </a>
+              <p className="font-mono text-sm text-gray-500 mt-4">
+                FIELD OFFICE:<br/>
+                MILWAUKEE, WI<br/>
+                UNITED STATES<br/>
+                43.0389° N, 87.9065° W
+              </p>
+            </div>
 
-                <p className="font-mono text-[10px] text-gray-700">
-                  © {new Date().getFullYear()} UFO STUDIOS. ALL RIGHTS RESERVED. <br/>
-                  UNAUTHORIZED REPRODUCTION WILL RESULT IN IMMEDIATE ABDUCTION.
-                </p>
-              </RevealOnScroll>
-           </div>
+            <div className="text-right w-full md:w-auto">
+               <div 
+                 className="w-16 h-16 ml-auto mb-4 cursor-pointer hover:scale-110 transition-transform duration-300"
+                 onClick={handleEasterEgg}
+               >
+                  <img 
+                    src="/images/logo.png" 
+                    alt="UFO Studios" 
+                    className="w-full h-full object-contain opacity-50 hover:opacity-100 transition-opacity" 
+                  />
+               </div>
+               <p className="font-mono text-xs text-gray-600">
+                 © 1987 - {new Date().getFullYear()} UFO STUDIOS CORP.<br/>
+                 GOVERNMENT CONTRACTOR 87-X.<br/>
+                 Please Be Prepared.
+               </p>
+            </div>
+          </div>
         </footer>
 
       </div>
