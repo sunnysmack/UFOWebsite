@@ -441,7 +441,7 @@ const App: React.FC = () => {
                <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-bold">
                  Established in the bedroom of 13 year old Jason Eddie Nowak during the summer of 1987, UFO Studios is a shadowy 
                  "non-government" contractor, specializing in narrative control and mass communication. 
-                Basically, we tell stories.  Possibly your story. Let's Make Up. 
+                Basically, we tell stories.  Possibly your story. Let's Make Stuff. 
                </p>
             </RevealOnScroll>
             
