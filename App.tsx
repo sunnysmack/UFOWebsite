@@ -36,12 +36,10 @@ const generateReel = () => {
         const min = 72;
         const max = 158;
         const num = Math.floor(Math.random() * (max - min + 1)) + min;
-        const randomId = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-        const randomSector = ['A', 'B', 'X', '9', 'Z', 'Q'][Math.floor(Math.random() * 6)];
         
         items.push({
             image: `/images/IMG_${num.toString().padStart(4, '0')}.AVIF`,
-            label: `EVIDENCE NO. ${randomId}-${randomSector}`
+            label: `PROJECT: FINGERPAINT`
         });
     }
     return items;
@@ -118,7 +116,7 @@ const App: React.FC = () => {
 
   // Initialize reel items once on load so we can preload them
   const [reelItems] = useState(() => generateReel());
-  const [currentEvidenceLabel, setCurrentEvidenceLabel] = useState('EVIDENCE NO. 8492-X');
+  const [currentEvidenceLabel, setCurrentEvidenceLabel] = useState('PROJECT: FINGERPAINT');
 
   // Combine all images for preloader
   const [preloadList] = useState(() => [
