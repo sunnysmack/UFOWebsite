@@ -15,7 +15,7 @@ import { NavItem } from './types';
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'CLASSIFIED', href: '#origin' },
-  { label: 'OPERATIONS', href: '#services' },
+  { label: 'PROTOCOLS', href: '#services' },
   { label: 'TIMETRUCK', href: '#timetruck' },
   { label: 'AUDIO', href: '#audio' },
   { label: 'SECTOR SCAN', href: '#intelligence' },
@@ -181,7 +181,7 @@ const App: React.FC = () => {
         >
            {/* Image Container - Warm White Glow added here - Opacity 100% background above */}
            <div 
-             className="relative max-w-full max-h-[70vh] shadow-[0_0_120px_rgba(255,220,180,0.5)] rounded-sm transition-all duration-500" 
+             className="relative max-w-full max-h-[70vh] shadow-[0_0_100px_rgba(255,225,200,0.3)] rounded-sm transition-all duration-500" 
              onClick={(e) => e.stopPropagation()}
            >
                 <img 
@@ -360,7 +360,7 @@ const App: React.FC = () => {
                {/* Text is Black for contrast against White BG */}
                <div className="mb-8">
                 <ScrambleText 
-                  text="ORIGIN: 7ASON" 
+                  text="ORIGIN" 
                   as="h2" 
                   className="font-sans text-5xl md:text-7xl font-bold leading-[0.9] text-ufo-black lining-nums" 
                 />
@@ -384,7 +384,7 @@ const App: React.FC = () => {
             </RevealOnScroll>
 
             {/* FILM STRIP / PARALLAX IMAGE COMPONENT */}
-            <div className="relative w-full max-w-sm mx-auto">
+            <div className="relative w-full max-w-xs mx-auto">
                <div className="aspect-square relative border-4 border-black shadow-[10px_10px_0px_rgba(0,0,0,0.2)]">
                   {/* Label */}
                    <div className="absolute -top-6 left-0 z-20 bg-black text-white px-2 py-1 font-mono text-xs tracking-widest flex items-center gap-2">
@@ -410,7 +410,7 @@ const App: React.FC = () => {
         <section id="services" className="py-24 bg-ufo-black border-t border-ufo-gray/30">
           <div className="container mx-auto px-6">
             <RevealOnScroll className="mb-16">
-              <ScrambleText text="OPERATIONS" as="h2" className="font-sans text-4xl md:text-6xl font-bold text-white mb-4" />
+              <ScrambleText text="PROTOCOLS" as="h2" className="font-sans text-4xl md:text-6xl font-bold text-white mb-4" />
               <div className="w-full h-[1px] bg-ufo-gray opacity-30" />
             </RevealOnScroll>
 
