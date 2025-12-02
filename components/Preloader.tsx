@@ -95,14 +95,13 @@ const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
     const sequence = [
       () => "INITIALIZING...",
       () => "CHECKING MEMORY... 128KB OK",
-      () => "ENTERING UFO.. OK",
-      () => "MOUNTING FILE SYSTEM...",
+      () => "ENTERING UFO...",
+      () => "SYNC TIMELINE...",
       () => `${userDataRef.current.device}`,
-      () => "SECURE CONNECTION...",
-      () => "SECURING TARGET...",
+      () => "SECUREING CONNECTION...",
       () => `${userDataRef.current.city}, ${userDataRef.current.country}`,
       () => "TRANSMITTING BEACON TO UFO...",
-      () => "HANDSHAKE...",
+      () => "7ASON: Welcome aboard!",
       () => "SYSTEM READY!"
     ];
 
