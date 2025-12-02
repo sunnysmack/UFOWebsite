@@ -7,6 +7,7 @@ interface CrackedScreenProps {
 
 const CrackedScreenOverlay: React.FC<CrackedScreenProps> = ({ onComplete }) => {
   const [stage, setStage] = useState(0);
+  const [currentImg, setCurrentImg] = useState(1);
 
   useEffect(() => {
     // Stage 1: Initial Impact (0ms)
@@ -27,9 +28,30 @@ const CrackedScreenOverlay: React.FC<CrackedScreenProps> = ({ onComplete }) => {
     };
   }, [onComplete]);
 
+  // Image cycling effect for "ts1.jpg" through "ts27.jpg"
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Randomly pick an image between 1 and 27
+      const num = Math.floor(Math.random() * 27) + 1;
+      setCurrentImg(num);
+    }, 60); // 60ms = ~16fps, very fast/glitchy
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-[99999] overflow-hidden pointer-events-auto cursor-none bg-black/20 backdrop-blur-[2px]">
+    <div className="fixed inset-0 z-[99999] overflow-hidden pointer-events-auto cursor-none bg-black">
       
+      {/* 0. BACKGROUND IMAGE CYCLE - Glitchy Layer */}
+      <div className={`absolute inset-0 z-20 transition-opacity duration-100 ${stage >= 1 ? 'opacity-60' : 'opacity-0'}`}>
+         <img 
+            src={`/images/ts${currentImg}.jpg`} 
+            alt="" 
+            className="w-full h-full object-cover filter contrast-125 brightness-75 sepia-[.5] hue-rotate-15"
+         />
+         <div className="absolute inset-0 bg-yellow-900/30 mix-blend-color" />
+      </div>
+
       {/* 1. CRACKS SVG - Fixed visual crack centered on screen */}
       <div className="absolute inset-0 z-50 pointer-events-none mix-blend-exclusion">
         <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -46,25 +68,25 @@ const CrackedScreenOverlay: React.FC<CrackedScreenProps> = ({ onComplete }) => {
 
       {/* 2. CHROMATIC ABERRATION / SHIFT */}
       <div className="absolute inset-0 z-40 mix-blend-color-dodge opacity-50 animate-[shift_0.1s_infinite]">
-         <div className="absolute inset-0 bg-red-500/20 translate-x-1" />
+         <div className="absolute inset-0 bg-yellow-500/20 translate-x-1" />
          <div className="absolute inset-0 bg-blue-500/20 -translate-x-1" />
       </div>
 
       {/* 3. HEAVY STATIC */}
-      <div className={`absolute inset-0 z-30 transition-opacity duration-1000 ${stage >= 1 ? 'opacity-80' : 'opacity-0'}`}>
-         <TvStaticBackground className="opacity-100 mix-blend-normal" />
+      <div className={`absolute inset-0 z-30 transition-opacity duration-1000 ${stage >= 1 ? 'opacity-70' : 'opacity-0'}`}>
+         <TvStaticBackground className="opacity-100 mix-blend-hard-light" />
       </div>
 
       {/* 4. SECRET MESSAGE */}
       <div className={`absolute inset-0 z-50 flex items-center justify-center transition-all duration-500 flex-col gap-4 ${stage >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
-         <div className="bg-black p-6 border-2 border-red-500 shadow-[0_0_50px_rgba(255,0,0,0.5)] transform -rotate-2">
-            <h1 className="font-mono text-3xl md:text-5xl text-red-500 font-bold tracking-tighter text-center animate-pulse">
-               SYSTEM BREACH
+         <div className="bg-black/90 p-6 border-4 border-yellow-400 shadow-[0_0_50px_rgba(255,215,0,0.6)] transform rotate-1">
+            <h1 className="font-mono text-4xl md:text-6xl text-yellow-400 font-bold tracking-tighter text-center animate-pulse drop-shadow-[0_0_10px_rgba(255,215,0,0.8)]">
+               BIRD CLUB
             </h1>
             <p className="font-mono text-xs md:text-sm text-white text-center mt-2 tracking-widest">
                IP LOGGED: {Math.floor(Math.random() * 255)}.{Math.floor(Math.random() * 255)}.{Math.floor(Math.random() * 255)}.XXX
             </p>
-            <p className="font-mono text-xs text-red-500 text-center mt-4 blink">
+            <p className="font-mono text-xs text-yellow-400 text-center mt-4 blink">
                DO NOT TURN OFF YOUR TERMINAL
             </p>
          </div>
@@ -81,7 +103,7 @@ const CrackedScreenOverlay: React.FC<CrackedScreenProps> = ({ onComplete }) => {
             75% { transform: translate(-2px, -2px); }
             100% { transform: translate(2px, 2px); }
         }
-        .blink { animation: blink 0.2s infinite; }
+        .blink { animation: blink 0.1s infinite; }
       `}</style>
     </div>
   );
