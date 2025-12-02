@@ -1,23 +1,85 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 interface ParallaxImageProps {
-  items: { image: string, label: string }[]; // New prop for reel data
+  items: { image: string, label: string }[];
   className?: string;
   onIndexChange?: (index: number) => void;
+  onImageClick?: (image: string) => void;
 }
 
-const ParallaxImage: React.FC<ParallaxImageProps> = ({ 
-  items, 
-  className = "",
-  onIndexChange
-}) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+// Sub-component for individual image with glitch logic
+const GlitchImage: React.FC<{ src: string; alt: string; isActive: boolean }> = ({ src, alt, isActive }) => {
+  const [glitchStyle, setGlitchStyle] = useState<React.CSSProperties>({});
 
   // Fallback if image fails
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     e.currentTarget.src = '/images/IMG_0072.AVIF';
   };
+
+  useEffect(() => {
+    // Only glitch active item occasionally
+    if (!isActive) {
+        setGlitchStyle({});
+        return;
+    }
+
+    const triggerGlitch = () => {
+        // Random glitch properties
+        const offset = (Math.random() - 0.5) * 10;
+        const scale = 1 + Math.random() * 0.05;
+        const filter = Math.random() > 0.7 
+            ? `invert(1) hue-rotate(${Math.random() * 90}deg)` 
+            : `contrast(150%) brightness(120%)`;
+        
+        setGlitchStyle({
+            transform: `translate(${offset}px, ${offset}px) scale(${scale})`,
+            filter: filter
+        });
+
+        // Reset quickly
+        setTimeout(() => setGlitchStyle({}), 100);
+    };
+
+    // Random interval for glitches
+    const interval = setInterval(() => {
+        if (Math.random() > 0.8) { // 20% chance to glitch per cycle
+            triggerGlitch();
+        }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isActive]);
+
+  return (
+      <img 
+        src={src} 
+        onError={handleError}
+        alt={alt}
+        className="w-full h-full object-cover transition-transform duration-500 ease-out"
+        style={{ 
+            ...glitchStyle,
+            // Base styles
+            transition: 'transform 0.5s ease-out, filter 0.1s steps(2)',
+            // If not glitching, use smooth zoom/focus
+            ...(Object.keys(glitchStyle).length === 0 ? {
+                transform: isActive ? 'scale(1)' : 'scale(0.9)',
+                opacity: isActive ? 1 : 0.5,
+                filter: isActive ? 'grayscale(100%) contrast(110%)' : 'grayscale(100%) contrast(150%) blur(2px)'
+            } : {})
+        }}
+        loading="lazy"
+      />
+  );
+};
+
+const ParallaxImage: React.FC<ParallaxImageProps> = ({ 
+  items, 
+  className = "",
+  onIndexChange,
+  onImageClick
+}) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const handleScroll = () => {
     if (!scrollContainerRef.current) return;
@@ -61,22 +123,10 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({
         {items.map((item, idx) => (
           <div 
             key={idx} 
-            className="w-full h-full snap-center shrink-0 relative flex items-center justify-center bg-black overflow-hidden"
+            onClick={() => onImageClick?.(item.image)}
+            className="w-full h-full snap-center shrink-0 relative flex items-center justify-center bg-black overflow-hidden cursor-zoom-in"
           >
-             {/* IMAGE */}
-             <img 
-               src={item.image} 
-               onError={handleError}
-               alt={`Evidence ${idx}`}
-               className="w-full h-full object-cover transition-transform duration-500 ease-out"
-               style={{ 
-                 // Subtle parallax zoom effect when active
-                 transform: activeIndex === idx ? 'scale(1)' : 'scale(0.9)',
-                 opacity: activeIndex === idx ? 1 : 0.5,
-                 filter: activeIndex === idx ? 'grayscale(100%) contrast(110%)' : 'grayscale(100%) contrast(150%) blur(2px)'
-               }}
-               loading={Math.abs(activeIndex - idx) < 2 ? "eager" : "lazy"}
-             />
+             <GlitchImage src={item.image} alt={`Evidence ${idx}`} isActive={activeIndex === idx} />
              
              {/* Vignette per frame */}
              <div className="absolute inset-0 bg-[radial-gradient(circle,transparent_60%,#000_100%)] pointer-events-none" />
