@@ -85,7 +85,7 @@ const App: React.FC = () => {
 
   // --- SWIPE LOGIC STATE ---
   const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
 
   // --- ORIGIN SECTION LOGIC ---
   const [originState, setOriginState] = useState({
@@ -116,20 +116,21 @@ const App: React.FC = () => {
   }, []);
 
   // --- SWIPE HANDLERS ---
-  const minSwipeDistance = 50;
+  const minSwipeDistance = 40;
 
   const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (!touchStart) return;
+    // Optional: Add live drag logic here if desired
   };
 
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart) return;
     
+    const touchEnd = e.changedTouches[0].clientX;
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
@@ -137,44 +138,47 @@ const App: React.FC = () => {
     if (isLeftSwipe || isRightSwipe) {
       if (navigator.vibrate) navigator.vibrate(10);
       
-      // Load new evidence
-      const newData = getRandomOriginData();
-      setOriginState(prev => ({
-        ...prev,
-        ...newData,
-        videoUrl: null, // Reset video if they swipe away
-        isCycling: false,
-        label: `${newData.label} [NEW]` 
-      }));
+      const direction = isLeftSwipe ? 'left' : 'right';
+      setSwipeDirection(direction);
+
+      // Delay data update to match CSS transition duration
+      setTimeout(() => {
+          const newData = getRandomOriginData();
+          setOriginState(prev => ({
+            ...prev,
+            ...newData,
+            videoUrl: null, // Reset video if they swipe away
+            isCycling: false,
+            label: `${newData.label} [NEW]` 
+          }));
+          setSwipeDirection(null);
+      }, 300); // 300ms matches CSS duration
     }
+    
+    setTouchStart(null);
   };
 
   // Cycle animation loop (visual feedback during processing)
   const startCycling = () => {
     setOriginState(prev => ({ ...prev, isCycling: true }));
     const interval = setInterval(() => {
-      // Generate random ID for the label, but DO NOT change the image
       const randomId = Math.floor(Math.random() * 99999).toString().padStart(5, '0');
-      
-      setOriginState(prev => {
-          return {
-            ...prev,
-            // image: prev.image, // Keep the same image!
-            label: `DECRYPTING... [${randomId}]`
-          };
-      });
+      setOriginState(prev => ({
+          ...prev,
+          label: `DECRYPTING... [${randomId}]`
+      }));
     }, 100);
     return interval;
   };
 
   // Handle Click Animation ("Live Decrypt / Video Gen")
-  const handleOriginClick = async () => {
-    // Prevent click if we just swiped (simple check)
-    if (touchStart && touchEnd && Math.abs(touchStart - touchEnd) > 10) return;
+  const handleOriginClick = async (e: React.MouseEvent) => {
+    // Prevent triggering if we are in the middle of a swipe transition
+    if (swipeDirection) return;
 
     if (originState.isCycling || originState.videoUrl) return;
 
-    // 1. Check API Key for Veo (Safer Logic)
+    // 1. Check API Key for Veo
     try {
         const aistudio = (window as any).aistudio;
         if (aistudio && typeof aistudio.hasSelectedApiKey === 'function') {
@@ -189,17 +193,12 @@ const App: React.FC = () => {
         console.warn("API Key check skipped or failed", e);
     }
 
-    // Haptic feedback
     if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
 
-    // Capture the current image BEFORE starting the cycle loop
     const imageToAnimate = originState.image;
-
-    // 2. Start Visual Feedback
     const cycleInterval = startCycling();
 
     try {
-        // 3. Fetch current image as Blob -> Base64
         const response = await fetch(imageToAnimate);
         if (!response.ok) throw new Error("Failed to fetch image source");
         const blob = await response.blob();
@@ -210,17 +209,14 @@ const App: React.FC = () => {
         reader.onloadend = async () => {
             try {
                 const base64 = reader.result as string;
-                
-                // 4. Call Veo API
                 const videoUrl = await animateImage(base64);
                 
-                // 5. Success
                 clearInterval(cycleInterval);
                 setOriginState(prev => ({
                     ...prev,
                     isCycling: false,
                     videoUrl: videoUrl,
-                    image: imageToAnimate, // Revert to the original image so video poster matches
+                    image: imageToAnimate, // Revert to original
                     label: 'LIVE FEED_ESTABLISHED'
                 }));
             } catch (err) {
@@ -229,15 +225,7 @@ const App: React.FC = () => {
                 setOriginState(prev => ({ ...prev, isCycling: false, label: 'SIGNAL LOST' }));
             }
         };
-
-        reader.onerror = (e) => {
-             console.error("FileReader Error", e);
-             clearInterval(cycleInterval);
-             setOriginState(prev => ({ ...prev, isCycling: false, label: 'READ ERROR' }));
-        }
-
     } catch (e) {
-        console.error("Failed to load image for animation", e);
         clearInterval(cycleInterval);
         setOriginState(prev => ({ ...prev, isCycling: false, label: 'ERROR' }));
     }
@@ -245,7 +233,6 @@ const App: React.FC = () => {
   
   const handleEasterEgg = () => {
     if (navigator.vibrate) {
-        // Intense vibration pattern: Short sharp pulses then a long decay
         navigator.vibrate([100, 30, 100, 30, 500, 50, 500]);
     }
     setIsCracked(true);
@@ -385,6 +372,7 @@ const App: React.FC = () => {
                    {/* Subtle back glow to integrate with background */}
                    <div className="absolute inset-0 bg-ufo-accent/5 rounded-full blur-2xl animate-pulse-slow" />
                    
+                   {/* REVERTED TO IMAGE AS REQUESTED */}
                    <img 
                      src="/images/logo.png" 
                      alt="UFO Studios" 
@@ -466,49 +454,59 @@ const App: React.FC = () => {
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
               >
-                 {/* New Parallax Component using random image */}
-                 <ParallaxImage 
-                   src={originState.image} 
-                   alt="Studio Interior" 
-                   isActive={originState.isCycling}
-                   videoUrl={originState.videoUrl}
-                   className="w-full h-full transition-all duration-700" 
-                 />
-                 
-                 {/* PROCESSING OVERLAY (New Requirement) */}
-                 {originState.isCycling && (
-                   <div className="absolute inset-0 bg-black/60 z-40 flex flex-col items-center justify-center animate-in fade-in duration-300">
-                      <div className="w-16 h-16 border-4 border-t-ufo-accent border-r-transparent border-b-ufo-accent border-l-transparent rounded-full animate-spin mb-4" />
-                      <p className="font-mono text-ufo-accent text-sm tracking-widest blink font-bold bg-black/50 px-2">
-                         TRANSMISSION STARTING...
-                      </p>
-                      <div className="w-48 h-1 bg-gray-800 mt-4 overflow-hidden">
-                         <div className="h-full bg-ufo-accent animate-[scan_1s_ease-in-out_infinite]" />
-                      </div>
-                   </div>
-                 )}
-
-                 {/* CRT Scanline Overlay */}
-                 <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(0,0,0,0.06),rgba(0,0,0,0.02),rgba(0,0,0,0.06))] z-10 bg-[length:100%_2px,3px_100%] pointer-events-none" />
-                 
-                 <div className="absolute top-4 left-4 border border-black text-black px-2 py-1 font-mono text-xs tracking-widest z-20 bg-ufo-accent/80 backdrop-blur-sm">
-                   TOP SECRET
-                 </div>
-                 <div className={`absolute bottom-4 right-4 font-mono text-xs bg-black px-2 py-1 font-bold z-20 transition-colors duration-100 ${originState.isCycling ? 'text-red-500 bg-black' : 'text-ufo-accent'}`}>
-                   {originState.label}
-                 </div>
-
-                 {/* Click Hint Overlay (Only on Hover when idle) */}
-                 {!originState.isCycling && !originState.videoUrl && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30">
-                       <div className="bg-black/80 text-white font-mono text-xs px-3 py-1 border border-white/20 tracking-widest mb-2">
-                          [ CLICK TO ANIMATE ]
+                 {/* 
+                     WRAPPER DIV HANDLES SWIPE TRANSITIONS
+                     This moves the entire "card content" left/right while the frame stays
+                 */}
+                 <div className={`w-full h-full transition-all duration-300 transform ${
+                     swipeDirection === 'left' ? '-translate-x-20 opacity-0 blur-sm' : 
+                     swipeDirection === 'right' ? 'translate-x-20 opacity-0 blur-sm' : 
+                     'translate-x-0 opacity-100 blur-0'
+                 }`}>
+                     {/* New Parallax Component using random image */}
+                     <ParallaxImage 
+                       src={originState.image} 
+                       alt="Studio Interior" 
+                       isActive={originState.isCycling}
+                       videoUrl={originState.videoUrl}
+                       className="w-full h-full" 
+                     />
+                     
+                     {/* PROCESSING OVERLAY */}
+                     {originState.isCycling && (
+                       <div className="absolute inset-0 bg-black/60 z-40 flex flex-col items-center justify-center animate-in fade-in duration-300">
+                          <div className="w-16 h-16 border-4 border-t-ufo-accent border-r-transparent border-b-ufo-accent border-l-transparent rounded-full animate-spin mb-4" />
+                          <p className="font-mono text-ufo-accent text-sm tracking-widest blink font-bold bg-black/50 px-2">
+                             TRANSMISSION STARTING...
+                          </p>
+                          <div className="w-48 h-1 bg-gray-800 mt-4 overflow-hidden">
+                             <div className="h-full bg-ufo-accent animate-[scan_1s_ease-in-out_infinite]" />
+                          </div>
                        </div>
-                       <div className="bg-black/60 text-white/50 font-mono text-[10px] px-2 py-0.5 tracking-widest md:hidden">
-                          [ SWIPE FOR INTEL ]
-                       </div>
-                    </div>
-                 )}
+                     )}
+
+                     {/* CRT Scanline Overlay */}
+                     <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(0,0,0,0.06),rgba(0,0,0,0.02),rgba(0,0,0,0.06))] z-10 bg-[length:100%_2px,3px_100%] pointer-events-none" />
+                     
+                     <div className="absolute top-4 left-4 border border-black text-black px-2 py-1 font-mono text-xs tracking-widest z-20 bg-ufo-accent/80 backdrop-blur-sm">
+                       TOP SECRET
+                     </div>
+                     <div className={`absolute bottom-4 right-4 font-mono text-xs bg-black px-2 py-1 font-bold z-20 transition-colors duration-100 ${originState.isCycling ? 'text-red-500 bg-black' : 'text-ufo-accent'}`}>
+                       {originState.label}
+                     </div>
+
+                     {/* Click Hint Overlay (Only on Hover when idle) */}
+                     {!originState.isCycling && !originState.videoUrl && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30">
+                           <div className="bg-black/80 text-white font-mono text-xs px-3 py-1 border border-white/20 tracking-widest mb-2">
+                              [ CLICK TO ANIMATE ]
+                           </div>
+                           <div className="bg-black/60 text-white/50 font-mono text-[10px] px-2 py-0.5 tracking-widest md:hidden">
+                              [ SWIPE FOR INTEL ]
+                           </div>
+                        </div>
+                     )}
+                 </div>
               </div>
               {/* Decorative corners - Black */}
               <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-black" />
@@ -578,6 +576,7 @@ const App: React.FC = () => {
                  className="w-16 h-16 ml-auto mb-4 cursor-pointer hover:scale-110 transition-transform duration-300"
                  onClick={handleEasterEgg}
                >
+                  {/* REVERTED TO IMAGE AS REQUESTED */}
                   <img 
                     src="/images/logo.png" 
                     alt="UFO Studios" 
