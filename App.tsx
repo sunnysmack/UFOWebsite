@@ -63,16 +63,13 @@ const App: React.FC = () => {
   const startCycling = () => {
     setOriginState(prev => ({ ...prev, isCycling: true }));
     const interval = setInterval(() => {
-      const min = 72;
-      const max = 158;
-      const num = Math.floor(Math.random() * (max - min + 1)) + min;
+      // Generate random ID for the label, but DO NOT change the image
       const randomId = Math.floor(Math.random() * 99999).toString().padStart(5, '0');
       
       setOriginState(prev => {
           return {
             ...prev,
-            // Keep current image if we want stability, or flash through images. Flashing is cooler for "processing".
-            image: `/images/IMG_${num.toString().padStart(4, '0')}.AVIF`,
+            // image: prev.image, // Keep the same image!
             label: `PROCESSING... [${randomId}]`
           };
       });
@@ -102,13 +99,14 @@ const App: React.FC = () => {
     // Haptic feedback
     if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
 
+    // Capture the current image BEFORE starting the cycle loop
+    const imageToAnimate = originState.image;
+
     // 2. Start Visual Feedback
     const cycleInterval = startCycling();
 
     try {
         // 3. Fetch current image as Blob -> Base64
-        const imageToAnimate = originState.image;
-        
         const response = await fetch(imageToAnimate);
         if (!response.ok) throw new Error("Failed to fetch image source");
         const blob = await response.blob();
