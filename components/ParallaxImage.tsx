@@ -164,12 +164,7 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({
              {/* Vignette per frame */}
              <div className="absolute inset-0 bg-[radial-gradient(circle,transparent_60%,#000_100%)] pointer-events-none" />
              
-             {/* Hover Hint */}
-             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30">
-                  <div className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                      <span className="text-white text-xl">+</span>
-                  </div>
-             </div>
+             {/* REMOVED HOVER HINT OVERLAY */}
           </div>
         ))}
       </div>
