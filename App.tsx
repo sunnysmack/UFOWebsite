@@ -235,9 +235,9 @@ const App: React.FC = () => {
 
             <div className="grid md:grid-cols-3 gap-8">
                {[
-                 { title: 'PROPAGANDA', desc: 'Social engineering and viral deployment. We control the narrative before it spreads.', num: '01' },
-                 { title: 'COUNTER INTEL', desc: 'Visual design that confuses, captivates, and commands attention.', num: '02' },
-                 { title: 'HISTORY REVISION', desc: 'Brand narrative construction. We write the past to secure your future.', num: '03' }
+                 { title: 'PROPAGANDA', desc: 'Social engineering and viral deployment. We control the narrative before it spreads. We will get your message out to the public.', num: '01' },
+                 { title: 'COUNTER INTEL', desc: 'Visual design that confuses, captivates, and commands attention. Your enemies are also ours.', num: '02' },
+                 { title: 'HISTORY REVISION', desc: 'Brand narrative construction. We will help write your future. ', num: '03' }
                ].map((service, idx) => (
                  <RevealOnScroll key={idx} delay={idx * 150} threshold={0.2}>
                    <div className="group border border-ufo-gray p-8 hover:bg-ufo-gray/10 hover:border-ufo-accent transition-all duration-300 h-full flex flex-col justify-between min-h-[300px] relative overflow-hidden">
