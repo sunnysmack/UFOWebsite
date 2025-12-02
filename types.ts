@@ -21,3 +21,15 @@ export interface AlienResponse {
   slogan: string;
   rationale: string;
 }
+
+export interface ThreatAnomaly {
+  object: string;
+  designation: string;
+  threatLevel: 'LOW' | 'MODERATE' | 'CRITICAL' | 'EXISTENTIAL';
+  description: string;
+}
+
+export interface ThreatAnalysisResponse {
+  sectorStatus: string;
+  anomalies: ThreatAnomaly[];
+}
