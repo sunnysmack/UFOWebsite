@@ -27,7 +27,7 @@ const ALBUMS = [
   {
     title: "The Colors Hit The Ground",
     year: "2017",
-    type: "EP,
+    type: "EP",
     duration: "14:00",
     color: "from-emerald-900 to-teal-900",
     tracks: ["The Wedding Song", "Telescopes", "Snow Like Medicine", "Sleepyhead"],
