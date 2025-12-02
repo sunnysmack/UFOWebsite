@@ -4,6 +4,7 @@ import NoiseOverlay from './components/NoiseOverlay';
 import RevealOnScroll from './components/RevealOnScroll';
 import ParallaxImage from './components/ParallaxImage';
 import TvStaticBackground from './components/TvStaticBackground';
+import GyroTilt from './components/GyroTilt';
 import ScrambleText from './components/ScrambleText';
 import Preloader from './components/Preloader';
 import VisualThreatAssessment from './components/VisualThreatAssessment';
@@ -109,7 +110,7 @@ const App: React.FC = () => {
 
         {/* Mobile Menu Overlay */}
         {menuOpen && (
-          <div className="fixed inset-0 z-30 bg-black flex flex-col justify-center md:hidden">
+          <div className="fixed inset-0 z-30 bg-[#121212] flex flex-col justify-center md:hidden">
              {/* Animation Keyframes */}
              <style>{`
                 @keyframes slideUpFade {
@@ -122,7 +123,7 @@ const App: React.FC = () => {
              `}</style>
              
              {/* Background Grid */}
-             <div className="absolute inset-0 bg-[linear-gradient(rgba(30,30,30,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(30,30,30,0.5)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none opacity-20" />
+             <div className="absolute inset-0 bg-[linear-gradient(rgba(40,40,40,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(40,40,40,0.5)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none opacity-20" />
 
              <div className="flex flex-col w-full px-8 relative z-10">
                 {NAV_ITEMS.map((item, idx) => (
@@ -147,7 +148,7 @@ const App: React.FC = () => {
              </div>
              
              <div className="absolute bottom-10 left-0 w-full text-center nav-item-enter" style={{ animationDelay: '600ms', opacity: 0 }}>
-                <p className="font-mono text-[10px] text-gray-600 uppercase tracking-widest">
+                <p className="font-mono text-[10px] text-gray-500 uppercase tracking-widest">
                   UFO STUDIOS /// MOBILE UPLINK
                 </p>
              </div>
@@ -164,18 +165,19 @@ const App: React.FC = () => {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-dashed border-ufo-gray opacity-[0.05] animate-[spin_40s_linear_infinite_reverse]" />
           
           <RevealOnScroll className="z-10 text-center flex flex-col items-center justify-center w-full">
-            {/* Main Hero Logo - New Levitation Animation */}
-            {/* Rounded-full applied to container and image to crop any square artifacts */}
-            <div className="relative mb-8 w-[75vw] h-[75vw] md:w-[340px] md:h-[340px] animate-levitate">
-                {/* Subtle back glow to integrate with background */}
-                <div className="absolute inset-0 bg-ufo-accent/5 rounded-full blur-2xl animate-pulse-slow" />
-                
-                <img 
-                  src="/images/logo.png" 
-                  alt="UFO Studios" 
-                  className="w-full h-full object-contain rounded-full relative z-10 drop-shadow-2xl" 
-                />
-            </div>
+            {/* Main Hero Logo - Wrapped in GyroTilt for Mobile interaction */}
+            <GyroTilt className="mb-8 w-[75vw] h-[75vw] md:w-[340px] md:h-[340px]">
+                <div className="relative w-full h-full animate-levitate">
+                   {/* Subtle back glow to integrate with background */}
+                   <div className="absolute inset-0 bg-ufo-accent/5 rounded-full blur-2xl animate-pulse-slow" />
+                   
+                   <img 
+                     src="/images/logo.png" 
+                     alt="UFO Studios" 
+                     className="w-full h-full object-contain rounded-full relative z-10 drop-shadow-2xl" 
+                   />
+                </div>
+            </GyroTilt>
           </RevealOnScroll>
 
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10">
@@ -227,7 +229,7 @@ const App: React.FC = () => {
                {/* Text is Black for contrast against White BG */}
                <div className="mb-8">
                 <ScrambleText 
-                  text="ORIGIN: 7ASON.COM" 
+                  text="ORIGIN:_7ASON" 
                   as="h2" 
                   className="font-sans text-5xl md:text-7xl font-bold leading-[0.9] text-ufo-black" 
                 />
