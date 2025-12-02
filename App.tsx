@@ -11,7 +11,6 @@ import VisualThreatAssessment from './components/VisualThreatAssessment';
 import Timetruck from './components/Timetruck';
 import SunnysmackAudio from './components/SunnysmackAudio';
 import CrackedScreenOverlay from './components/CrackedScreenOverlay';
-import { animateImage } from './services/geminiService';
 import { NavItem } from './types';
 
 const NAV_ITEMS: NavItem[] = [
@@ -91,8 +90,7 @@ const App: React.FC = () => {
   const [originState, setOriginState] = useState({
     image: '/images/IMG_0072.AVIF',
     label: 'EVIDENCE NO. 8492-X',
-    isCycling: false, // Used for processing state
-    videoUrl: null as string | null
+    isCycling: false, // NOW REPRESENTS THE "SLOT MACHINE" EFFECT
   });
 
   // Helper to generate random image data
@@ -147,7 +145,6 @@ const App: React.FC = () => {
             setOriginState(prev => ({
                 ...prev,
                 ...newData,
-                videoUrl: null, // Reset video if they swipe away
                 isCycling: false,
                 label: `${newData.label} [NEW]` 
             }));
@@ -170,80 +167,52 @@ const App: React.FC = () => {
   const onMouseUp = (e: React.MouseEvent) => handleInputEnd(e.clientX);
   const onMouseLeave = () => setDragStart(null); // Cancel drag if leaving area
 
-  // Handle Image 404s (Sync state so animation doesn't fail)
+  // Handle Image 404s
   const handleImageError = (fallbackSrc: string) => {
-    console.log("Image failed, falling back to:", fallbackSrc);
-    setOriginState(prev => ({ ...prev, image: fallbackSrc }));
+    // Only update if we aren't already on the fallback to avoid infinite loops
+    if (originState.image !== fallbackSrc) {
+       setOriginState(prev => ({ ...prev, image: fallbackSrc }));
+    }
   };
 
-  // Cycle animation loop (visual feedback during processing)
-  const startCycling = () => {
+  // Handle Click Animation ("Slot Machine / Glitch Effect")
+  const handleOriginClick = () => {
+    if (originState.isCycling) return;
+
+    if (navigator.vibrate) navigator.vibrate(50); // Initial haptic feedback
+
+    // Start the cycle
     setOriginState(prev => ({ ...prev, isCycling: true }));
+
+    let steps = 0;
+    const maxSteps = 12; // Number of "slots" to cycle through
+    const intervalTime = 60; // Speed of cycle in ms
+
     const interval = setInterval(() => {
-      const randomId = Math.floor(Math.random() * 99999).toString().padStart(5, '0');
-      setOriginState(prev => ({
-          ...prev,
-          label: `DECRYPTING... [${randomId}]`
-      }));
-    }, 100);
-    return interval;
-  };
+        steps++;
+        const randomData = getRandomOriginData();
+        
+        // Random haptic ticks
+        if (navigator.vibrate && Math.random() > 0.7) navigator.vibrate(10);
 
-  // Handle Click Animation ("Live Decrypt / Video Gen")
-  const handleOriginClick = async () => {
-    if (originState.isCycling || originState.videoUrl) return;
+        setOriginState({
+            isCycling: true,
+            image: randomData.image,
+            label: `DECRYPTING... ${Math.floor(Math.random() * 99999)}`
+        });
 
-    // 1. Check API Key for Veo
-    try {
-        const aistudio = (window as any).aistudio;
-        if (aistudio && typeof aistudio.hasSelectedApiKey === 'function') {
-            const hasKey = await aistudio.hasSelectedApiKey();
-            if (!hasKey) {
-                if (typeof aistudio.openSelectKey === 'function') {
-                    await aistudio.openSelectKey();
-                }
-            }
+        if (steps >= maxSteps) {
+            clearInterval(interval);
+            // Land on final image
+            const finalData = getRandomOriginData();
+            setOriginState({
+                image: finalData.image,
+                label: finalData.label,
+                isCycling: false
+            });
+            if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
         }
-    } catch (e) {
-        console.warn("API Key check skipped or failed", e);
-    }
-
-    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
-
-    const imageToAnimate = originState.image;
-    const cycleInterval = startCycling();
-
-    try {
-        const response = await fetch(imageToAnimate);
-        if (!response.ok) throw new Error("Failed to fetch image source");
-        const blob = await response.blob();
-        
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        
-        reader.onloadend = async () => {
-            try {
-                const base64 = reader.result as string;
-                const videoUrl = await animateImage(base64);
-                
-                clearInterval(cycleInterval);
-                setOriginState(prev => ({
-                    ...prev,
-                    isCycling: false,
-                    videoUrl: videoUrl,
-                    image: imageToAnimate, // Revert to original
-                    label: 'LIVE FEED_ESTABLISHED'
-                }));
-            } catch (err) {
-                console.error("Animation generation error:", err);
-                clearInterval(cycleInterval);
-                setOriginState(prev => ({ ...prev, isCycling: false, label: 'SIGNAL LOST' }));
-            }
-        };
-    } catch (e) {
-        clearInterval(cycleInterval);
-        setOriginState(prev => ({ ...prev, isCycling: false, label: 'ERROR' }));
-    }
+    }, intervalTime);
   };
   
   const handleEasterEgg = () => {
@@ -484,48 +453,25 @@ const App: React.FC = () => {
                        src={originState.image} 
                        alt="Studio Interior" 
                        isActive={originState.isCycling}
-                       videoUrl={originState.videoUrl}
                        className="w-full h-full" 
                        onError={handleImageError}
                      />
                      
-                     {/* PROCESSING OVERLAY */}
-                     {originState.isCycling && (
-                       <div className="absolute inset-0 bg-black/60 z-40 flex flex-col items-center justify-center animate-in fade-in duration-300">
-                          <div className="w-16 h-16 border-4 border-t-ufo-accent border-r-transparent border-b-ufo-accent border-l-transparent rounded-full animate-spin mb-4" />
-                          <p className="font-mono text-ufo-accent text-sm tracking-widest blink font-bold bg-black/50 px-2">
-                             TRANSMISSION STARTING...
-                          </p>
-                          <div className="w-48 h-1 bg-gray-800 mt-4 overflow-hidden">
-                             <div className="h-full bg-ufo-accent animate-[scan_1s_ease-in-out_infinite]" />
-                          </div>
-                       </div>
-                     )}
-
-                     {/* ERROR OVERLAY */}
-                     {originState.label === 'SIGNAL LOST' && (
-                        <div className="absolute inset-0 bg-black/80 z-40 flex flex-col items-center justify-center animate-in fade-in duration-300">
-                           <div className="text-4xl text-red-500 mb-2 font-mono">⚠</div>
-                           <h3 className="text-red-500 font-mono text-xl tracking-widest font-bold">SIGNAL LOST</h3>
-                           <p className="text-red-800 font-mono text-xs mt-2">RETRY TRANSMISSION</p>
-                        </div>
-                     )}
-
                      {/* CRT Scanline Overlay */}
                      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(0,0,0,0.06),rgba(0,0,0,0.02),rgba(0,0,0,0.06))] z-10 bg-[length:100%_2px,3px_100%] pointer-events-none" />
                      
                      <div className="absolute top-4 left-4 border border-black text-black px-2 py-1 font-mono text-xs tracking-widest z-20 bg-ufo-accent/80 backdrop-blur-sm">
                        TOP SECRET
                      </div>
-                     <div className={`absolute bottom-4 right-4 font-mono text-xs bg-black px-2 py-1 font-bold z-20 transition-colors duration-100 ${originState.isCycling || originState.label === 'SIGNAL LOST' ? 'text-red-500 bg-black' : 'text-ufo-accent'}`}>
+                     <div className={`absolute bottom-4 right-4 font-mono text-xs bg-black px-2 py-1 font-bold z-20 transition-colors duration-100 ${originState.isCycling ? 'text-red-500 bg-black' : 'text-ufo-accent'}`}>
                        {originState.label}
                      </div>
 
                      {/* Click Hint Overlay (Only on Hover when idle) */}
-                     {!originState.isCycling && !originState.videoUrl && originState.label !== 'SIGNAL LOST' && (
+                     {!originState.isCycling && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30">
                            <div className="bg-black/80 text-white font-mono text-xs px-3 py-1 border border-white/20 tracking-widest mb-2">
-                              [ CLICK TO ANIMATE ]
+                              [ CLICK TO GLITCH ]
                            </div>
                            <div className="bg-black/60 text-white/50 font-mono text-[10px] px-2 py-0.5 tracking-widest md:hidden">
                               [ SWIPE FOR INTEL ]
