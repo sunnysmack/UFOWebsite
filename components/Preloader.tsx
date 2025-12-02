@@ -93,15 +93,15 @@ const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
 
     // 3. Boot Sequence Definition
     const sequence = [
-      () => "INITIALIZING...",
+    () => "INITIALIZING...",
       () => "CHECKING MEMORY... 128KB OK",
       () => "ENTERING UFO...",
-      () => "SYNC TIMELINE...",
+      () => "TIMELINE SYNC...",
       () => `${userDataRef.current.device}`,
       () => "SECUREING CONNECTION...",
       () => `${userDataRef.current.city}, ${userDataRef.current.country}`,
-      () => "TRANSMITTING BEACON TO UFO...",
-      () => "7ASON: Welcome aboard!",
+      () => "TRANSMITTING TO UFO...",
+      () => "7ASON SAYS: Welcome aboard!",
       () => "SYSTEM READY!"
     ];
 
