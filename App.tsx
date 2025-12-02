@@ -84,7 +84,7 @@ const App: React.FC = () => {
   const [originVisible, setOriginVisible] = useState(false);
 
   // --- SWIPE LOGIC STATE ---
-  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [dragStart, setDragStart] = useState<number | null>(null);
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
 
   // --- ORIGIN SECTION LOGIC ---
@@ -115,47 +115,65 @@ const App: React.FC = () => {
     setOriginState(prev => ({ ...prev, ...initial }));
   }, []);
 
-  // --- SWIPE HANDLERS ---
+  // --- UNIFIED TOUCH/MOUSE HANDLERS ---
   const minSwipeDistance = 40;
 
-  const onTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
+  const handleInputStart = (clientX: number) => {
+    setDragStart(clientX);
   };
 
-  const onTouchMove = (e: React.TouchEvent) => {
-    if (!touchStart) return;
-    // Optional: Add live drag logic here if desired
-  };
-
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (!touchStart) return;
+  const handleInputEnd = (clientX: number) => {
+    if (dragStart === null) return;
     
-    const touchEnd = e.changedTouches[0].clientX;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
+    const distance = dragStart - clientX;
+    const absDist = Math.abs(distance);
+    
+    // Check if it's a click (very small movement)
+    if (absDist < 10) {
+        handleOriginClick();
+    } 
+    // Check if it's a swipe
+    else if (absDist > minSwipeDistance) {
+        const isLeftSwipe = distance > 0;
+        
+        if (navigator.vibrate) navigator.vibrate(10);
+        
+        const direction = isLeftSwipe ? 'left' : 'right';
+        setSwipeDirection(direction);
 
-    if (isLeftSwipe || isRightSwipe) {
-      if (navigator.vibrate) navigator.vibrate(10);
-      
-      const direction = isLeftSwipe ? 'left' : 'right';
-      setSwipeDirection(direction);
-
-      // Delay data update to match CSS transition duration
-      setTimeout(() => {
-          const newData = getRandomOriginData();
-          setOriginState(prev => ({
-            ...prev,
-            ...newData,
-            videoUrl: null, // Reset video if they swipe away
-            isCycling: false,
-            label: `${newData.label} [NEW]` 
-          }));
-          setSwipeDirection(null);
-      }, 300); // 300ms matches CSS duration
+        // Delay data update to match CSS transition duration
+        setTimeout(() => {
+            const newData = getRandomOriginData();
+            setOriginState(prev => ({
+                ...prev,
+                ...newData,
+                videoUrl: null, // Reset video if they swipe away
+                isCycling: false,
+                label: `${newData.label} [NEW]` 
+            }));
+            setSwipeDirection(null);
+        }, 300); // 300ms matches CSS duration
     }
     
-    setTouchStart(null);
+    setDragStart(null);
+  };
+
+  // Touch Events
+  const onTouchStart = (e: React.TouchEvent) => handleInputStart(e.targetTouches[0].clientX);
+  const onTouchEnd = (e: React.TouchEvent) => handleInputEnd(e.changedTouches[0].clientX);
+
+  // Mouse Events
+  const onMouseDown = (e: React.MouseEvent) => {
+      e.preventDefault(); // Prevent default drag behavior of images
+      handleInputStart(e.clientX);
+  }
+  const onMouseUp = (e: React.MouseEvent) => handleInputEnd(e.clientX);
+  const onMouseLeave = () => setDragStart(null); // Cancel drag if leaving area
+
+  // Handle Image 404s (Sync state so animation doesn't fail)
+  const handleImageError = (fallbackSrc: string) => {
+    console.log("Image failed, falling back to:", fallbackSrc);
+    setOriginState(prev => ({ ...prev, image: fallbackSrc }));
   };
 
   // Cycle animation loop (visual feedback during processing)
@@ -172,10 +190,7 @@ const App: React.FC = () => {
   };
 
   // Handle Click Animation ("Live Decrypt / Video Gen")
-  const handleOriginClick = async (e: React.MouseEvent) => {
-    // Prevent triggering if we are in the middle of a swipe transition
-    if (swipeDirection) return;
-
+  const handleOriginClick = async () => {
     if (originState.isCycling || originState.videoUrl) return;
 
     // 1. Check API Key for Veo
@@ -449,10 +464,11 @@ const App: React.FC = () => {
               {/* Image Border darkened for contrast */}
               <div 
                 className="aspect-square border border-black relative overflow-hidden bg-black rounded-sm shadow-[10px_10px_0px_rgba(0,0,0,0.2)] cursor-pointer group-hover:shadow-[15px_15px_0px_rgba(0,0,0,0.2)] transition-shadow duration-300"
-                onClick={handleOriginClick}
                 onTouchStart={onTouchStart}
-                onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
+                onMouseDown={onMouseDown}
+                onMouseUp={onMouseUp}
+                onMouseLeave={onMouseLeave}
               >
                  {/* 
                      WRAPPER DIV HANDLES SWIPE TRANSITIONS
@@ -470,6 +486,7 @@ const App: React.FC = () => {
                        isActive={originState.isCycling}
                        videoUrl={originState.videoUrl}
                        className="w-full h-full" 
+                       onError={handleImageError}
                      />
                      
                      {/* PROCESSING OVERLAY */}
@@ -485,18 +502,27 @@ const App: React.FC = () => {
                        </div>
                      )}
 
+                     {/* ERROR OVERLAY */}
+                     {originState.label === 'SIGNAL LOST' && (
+                        <div className="absolute inset-0 bg-black/80 z-40 flex flex-col items-center justify-center animate-in fade-in duration-300">
+                           <div className="text-4xl text-red-500 mb-2 font-mono">⚠</div>
+                           <h3 className="text-red-500 font-mono text-xl tracking-widest font-bold">SIGNAL LOST</h3>
+                           <p className="text-red-800 font-mono text-xs mt-2">RETRY TRANSMISSION</p>
+                        </div>
+                     )}
+
                      {/* CRT Scanline Overlay */}
                      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(0,0,0,0.06),rgba(0,0,0,0.02),rgba(0,0,0,0.06))] z-10 bg-[length:100%_2px,3px_100%] pointer-events-none" />
                      
                      <div className="absolute top-4 left-4 border border-black text-black px-2 py-1 font-mono text-xs tracking-widest z-20 bg-ufo-accent/80 backdrop-blur-sm">
                        TOP SECRET
                      </div>
-                     <div className={`absolute bottom-4 right-4 font-mono text-xs bg-black px-2 py-1 font-bold z-20 transition-colors duration-100 ${originState.isCycling ? 'text-red-500 bg-black' : 'text-ufo-accent'}`}>
+                     <div className={`absolute bottom-4 right-4 font-mono text-xs bg-black px-2 py-1 font-bold z-20 transition-colors duration-100 ${originState.isCycling || originState.label === 'SIGNAL LOST' ? 'text-red-500 bg-black' : 'text-ufo-accent'}`}>
                        {originState.label}
                      </div>
 
                      {/* Click Hint Overlay (Only on Hover when idle) */}
-                     {!originState.isCycling && !originState.videoUrl && (
+                     {!originState.isCycling && !originState.videoUrl && originState.label !== 'SIGNAL LOST' && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30">
                            <div className="bg-black/80 text-white font-mono text-xs px-3 py-1 border border-white/20 tracking-widest mb-2">
                               [ CLICK TO ANIMATE ]
