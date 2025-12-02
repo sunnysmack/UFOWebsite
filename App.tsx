@@ -12,6 +12,7 @@ import Timetruck from './components/Timetruck';
 import SunnysmackAudio from './components/SunnysmackAudio';
 import CrackedScreenOverlay from './components/CrackedScreenOverlay';
 import { NavItem } from './types';
+import { animateImage } from './services/geminiService';
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'CLASSIFIED', href: '#origin' },
@@ -78,8 +79,10 @@ const App: React.FC = () => {
   // Easter Egg State
   const [isCracked, setIsCracked] = useState(false);
   
-  // Fullscreen Image State
+  // Fullscreen Image & Animation State
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animatedVideoUrl, setAnimatedVideoUrl] = useState<string | null>(null);
 
   // Ref and state for the lighting transition on the Origin section
   const originRef = useRef<HTMLDivElement>(null);
@@ -127,6 +130,42 @@ const App: React.FC = () => {
     setIsCracked(true);
   };
 
+  // Helper to convert URL to Base64 for the API
+  const getBase64FromUrl = async (url: string): Promise<string> => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
+  const handleAnimate = async () => {
+    if (!fullscreenImage || isAnimating) return;
+    
+    setIsAnimating(true);
+    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+
+    try {
+      const base64 = await getBase64FromUrl(fullscreenImage);
+      const videoUrl = await animateImage(base64);
+      setAnimatedVideoUrl(videoUrl);
+    } catch (error) {
+      console.error("Animation failed:", error);
+      alert("SIGNAL INTERFERENCE. ANIMATION FAILED.");
+    } finally {
+      setIsAnimating(false);
+    }
+  };
+
+  const closeFullscreen = () => {
+    setFullscreenImage(null);
+    setAnimatedVideoUrl(null);
+    setIsAnimating(false);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -162,24 +201,65 @@ const App: React.FC = () => {
       {loading && <Preloader onComplete={() => setLoading(false)} />}
       {isCracked && <CrackedScreenOverlay onComplete={() => setIsCracked(false)} />}
       
-      {/* Fullscreen Image Modal */}
+      {/* Fullscreen Image/Animation Modal */}
       {fullscreenImage && (
         <div 
-          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-zoom-out"
-          onClick={() => setFullscreenImage(null)}
+          className="fixed inset-0 z-[100] bg-black/98 flex flex-col items-center justify-center p-4 animate-in fade-in duration-300"
+          onClick={closeFullscreen}
         >
-           {/* Image container */}
-           <div className="relative max-w-full max-h-full border border-ufo-gray shadow-[0_0_50px_rgba(255,215,0,0.2)]" onClick={(e) => e.stopPropagation()}>
-              <img src={fullscreenImage} alt="Evidence" className="max-h-[90vh] max-w-[90vw] object-contain" />
-              {/* Scanlines */}
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] pointer-events-none mix-blend-overlay" />
-              
+           {/* Image/Video Container - Warm White Glow added here */}
+           <div 
+             className="relative max-w-full max-h-[70vh] shadow-[0_0_100px_rgba(255,220,180,0.4)] rounded-sm transition-all duration-500" 
+             onClick={(e) => e.stopPropagation()}
+           >
+              {animatedVideoUrl ? (
+                <video 
+                  src={animatedVideoUrl} 
+                  autoPlay 
+                  loop 
+                  className="max-h-[70vh] max-w-[90vw] object-contain rounded-sm"
+                />
+              ) : (
+                <div className="relative">
+                  <img 
+                    src={fullscreenImage} 
+                    alt="Evidence" 
+                    className={`max-h-[70vh] max-w-[90vw] object-contain rounded-sm transition-opacity duration-500 ${isAnimating ? 'opacity-50 blur-sm' : 'opacity-100'}`} 
+                  />
+                  {/* Loading Spinner */}
+                  {isAnimating && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                        <div className="w-12 h-12 border-2 border-ufo-accent border-t-transparent rounded-full animate-spin" />
+                        <span className="font-mono text-ufo-accent text-xs tracking-widest blink">GENERATING...</span>
+                    </div>
+                  )}
+                </div>
+              )}
+           </div>
+
+           {/* Controls Row - Below Image */}
+           <div className="flex gap-4 mt-8 z-50" onClick={(e) => e.stopPropagation()}>
               <button 
-                onClick={() => setFullscreenImage(null)}
-                className="absolute top-4 right-4 bg-black/80 text-ufo-accent border border-ufo-accent px-4 py-2 font-mono text-sm hover:bg-ufo-accent hover:text-black transition-colors"
+                onClick={closeFullscreen}
+                className="bg-black text-white border border-white/30 px-6 py-3 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-all uppercase"
               >
-                CLOSE
+                [ Close ]
               </button>
+              
+              {!animatedVideoUrl && (
+                <button 
+                  onClick={handleAnimate}
+                  disabled={isAnimating}
+                  className={`px-6 py-3 font-mono text-sm tracking-widest transition-all uppercase flex items-center gap-2
+                    ${isAnimating 
+                      ? 'bg-ufo-gray text-gray-500 cursor-not-allowed border border-transparent' 
+                      : 'bg-ufo-accent text-black hover:bg-white border border-ufo-accent shadow-[0_0_20px_rgba(255,215,0,0.3)]'
+                    }`}
+                >
+                  {isAnimating ? 'Processing...' : 'Animate'}
+                  {!isAnimating && <span className="text-[10px]">▶</span>}
+                </button>
+              )}
            </div>
         </div>
       )}
