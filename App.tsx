@@ -160,7 +160,7 @@ const App: React.FC = () => {
             {/* Main Hero Logo - Updated to use logo.jpeg */}
             <RollingLogo className="w-[75vw] h-[75vw] md:w-[340px] md:h-[340px] mb-8">
                 <img 
-                  src=rc="/images/logo.jpeg
+                  src=rc="./logo.jpeg
                   alt="UFO Studios" 
                   className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] filter contrast-125" 
                 />
