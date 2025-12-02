@@ -11,7 +11,7 @@ const ALBUMS = [
     duration: "42:15",
     color: "from-purple-900 to-blue-900",
     tracks: ["Static Dawn", "Neon Veins", "Zero Point"],
-    link: "https://spotify.com"
+    link: "https://open.spotify.com/artist/sunnysmack" 
   },
   {
     title: "ANALOG_GHOSTS",
@@ -20,7 +20,7 @@ const ALBUMS = [
     duration: "18:30",
     color: "from-red-900 to-orange-900",
     tracks: ["Haunt", "Poltergeist", "Exorcism_V2"],
-    link: "https://spotify.com"
+    link: "https://open.spotify.com/artist/sunnysmack"
   },
   {
     title: "VOID_RUNNER",
@@ -29,7 +29,34 @@ const ALBUMS = [
     duration: "04:20",
     color: "from-emerald-900 to-teal-900",
     tracks: ["Void Runner (Original Mix)"],
-    link: "https://spotify.com"
+    link: "https://open.spotify.com/artist/sunnysmack"
+  },
+  {
+    title: "SYSTEM_CRASH_V1",
+    year: "2021",
+    type: "EP",
+    duration: "22:10",
+    color: "from-rose-900 to-pink-900",
+    tracks: ["Kernel Panic", "Fatal Exception", "Force Quit"],
+    link: "https://open.spotify.com/artist/sunnysmack"
+  },
+  {
+    title: "DEEP_WEB_DIVING",
+    year: "2020",
+    type: "LP",
+    duration: "38:45",
+    color: "from-cyan-900 to-blue-900",
+    tracks: ["Onion Router", "Encrypted Walls", "Bitcoin Assassin"],
+    link: "https://open.spotify.com/artist/sunnysmack"
+  },
+  {
+    title: "SIGNAL_LOSS",
+    year: "2019",
+    type: "SINGLE",
+    duration: "03:33",
+    color: "from-gray-800 to-gray-900",
+    tracks: ["White Noise", "Static (Reprise)"],
+    link: "https://open.spotify.com/artist/sunnysmack"
   }
 ];
 
