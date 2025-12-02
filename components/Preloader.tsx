@@ -10,9 +10,16 @@ import React, { useEffect, useState, useRef } from 'react';
 // -----------------------------------------------------------------------------
 const WEBHOOK_URL = ""; 
 
-const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
+interface PreloaderProps {
+  onComplete: () => void;
+  images?: string[];
+}
+
+const Preloader: React.FC<PreloaderProps> = ({ onComplete, images = [] }) => {
   const [lines, setLines] = useState<string[]>([]);
   const [isExiting, setIsExiting] = useState(false);
+  const [textSequenceDone, setTextSequenceDone] = useState(false);
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
   
   // Ref ensures we don't send duplicate notifications if re-renders happen
   const notificationSentRef = useRef(false);
@@ -25,25 +32,57 @@ const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
     userAgent: navigator.userAgent
   });
 
+  // --- ASSET PRELOADING LOGIC ---
+  useEffect(() => {
+    if (!images || images.length === 0) {
+      setAssetsLoaded(true);
+      return;
+    }
+
+    let loadedCount = 0;
+    const total = images.length;
+    let isMounted = true;
+
+    const handleItemLoad = () => {
+      if (!isMounted) return;
+      loadedCount++;
+      if (loadedCount >= total) {
+        setAssetsLoaded(true);
+      }
+    };
+
+    // Deduplicate images
+    const uniqueImages = [...new Set(images)];
+
+    uniqueImages.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = handleItemLoad;
+      img.onerror = handleItemLoad; // Proceed even if asset is missing to avoid hanging
+    });
+
+    return () => { isMounted = false; };
+  }, [images]);
+
+  // --- NOTIFICATION LOGIC ---
   const sendNotification = async () => {
     if (notificationSentRef.current) return;
     notificationSentRef.current = true;
 
     if (!WEBHOOK_URL) {
-      console.log("Visitor Log (Configure WEBHOOK_URL in Preloader.tsx to receive this on phone):", userDataRef.current);
+      console.log("Visitor Log (Configure WEBHOOK_URL in Preloader.tsx):", userDataRef.current);
       return;
     }
 
     try {
       const { city, country, ip, device, userAgent } = userDataRef.current;
       
-      // Send data to Discord Webhook
       await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: "UFO STUDIOS SECURITY",
-          avatar_url: "https://ufostudios.us/logo.png", // Ensure this path is valid in prod
+          avatar_url: "https://ufostudios.us/logo.png",
           content: "🚨 **INTRUSION DETECTED**",
           embeds: [{
             title: "New Visitor Logged",
@@ -65,7 +104,7 @@ const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   };
 
   useEffect(() => {
-    // 1. Hardware Detection (User Agent)
+    // 1. Hardware Detection
     const ua = navigator.userAgent;
     if (ua.match(/Android/i)) userDataRef.current.device = "ANDROID HANDSET";
     else if (ua.match(/iPhone/i)) userDataRef.current.device = "IPHONE SECURE UNIT";
@@ -74,31 +113,28 @@ const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
     else if (ua.match(/Win/i)) userDataRef.current.device = "WINDOWS TERMINAL";
     else if (ua.match(/Linux/i)) userDataRef.current.device = "LINUX NODE";
     
-    // 2. Network Trace (IP Geolocation)
+    // 2. Network Trace
     fetch('https://ipapi.co/json/')
       .then(res => res.json())
       .then(data => {
         if (data.city) userDataRef.current.city = data.city.toUpperCase();
         if (data.country_name) userDataRef.current.country = data.country_name.toUpperCase();
         if (data.ip) userDataRef.current.ip = data.ip;
-
-        // Trigger notification AFTER we have the location
         sendNotification();
       })
       .catch(err => {
         console.log("Trace blocked by firewall", err);
-        // Send whatever data we have even if location failed
         sendNotification();
       });
 
     // 3. Boot Sequence Definition
     const sequence = [
-    () => "INITIALIZING...",
+      () => "INITIALIZING...",
       () => "CHECKING MEMORY... 128KB OK",
       () => "ENTERING UFO...",
       () => "TIMELINE SYNC...",
       () => `${userDataRef.current.device}`,
-      () => "SECUREING CONNECTION...",
+      () => "SECURING CONNECTION...",
       () => `${userDataRef.current.city}, ${userDataRef.current.country}`,
       () => "TRANSMITTING TO UFO...",
       () => "7ASON SAYS: Welcome aboard!",
@@ -110,20 +146,32 @@ const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
     const interval = setInterval(() => {
       if (currentIndex >= sequence.length) {
         clearInterval(interval);
-        setTimeout(() => {
-            setIsExiting(true);
-            setTimeout(onComplete, 800); // Wait for fade out
-        }, 800);
+        setTextSequenceDone(true);
         return;
       }
 
       const getLineContent = sequence[currentIndex];
       setLines(prev => [...prev, getLineContent()]);
       currentIndex++;
-    }, 400); // Speed of text (ms)
+    }, 400);
 
     return () => clearInterval(interval);
-  }, [onComplete]);
+  }, []);
+
+  // Show "Downloading" message if text is done but images are still loading
+  useEffect(() => {
+    if (textSequenceDone && !assetsLoaded) {
+      setLines(prev => [...prev, "DOWNLOADING ART FILES..."]);
+    }
+  }, [textSequenceDone, assetsLoaded]);
+
+  // COMPLETE when BOTH text sequence and assets are ready
+  useEffect(() => {
+    if (textSequenceDone && assetsLoaded && !isExiting) {
+      setIsExiting(true);
+      setTimeout(onComplete, 800);
+    }
+  }, [textSequenceDone, assetsLoaded, isExiting, onComplete]);
 
   if (isExiting && lines.length === 0) return null;
 
