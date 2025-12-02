@@ -78,6 +78,9 @@ const App: React.FC = () => {
   // Easter Egg State
   const [isCracked, setIsCracked] = useState(false);
   
+  // Fullscreen Image State
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+
   // Ref and state for the lighting transition on the Origin section
   const originRef = useRef<HTMLDivElement>(null);
   const [originVisible, setOriginVisible] = useState(false);
@@ -159,6 +162,28 @@ const App: React.FC = () => {
       {loading && <Preloader onComplete={() => setLoading(false)} />}
       {isCracked && <CrackedScreenOverlay onComplete={() => setIsCracked(false)} />}
       
+      {/* Fullscreen Image Modal */}
+      {fullscreenImage && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-zoom-out"
+          onClick={() => setFullscreenImage(null)}
+        >
+           {/* Image container */}
+           <div className="relative max-w-full max-h-full border border-ufo-gray shadow-[0_0_50px_rgba(255,215,0,0.2)]" onClick={(e) => e.stopPropagation()}>
+              <img src={fullscreenImage} alt="Evidence" className="max-h-[90vh] max-w-[90vw] object-contain" />
+              {/* Scanlines */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] pointer-events-none mix-blend-overlay" />
+              
+              <button 
+                onClick={() => setFullscreenImage(null)}
+                className="absolute top-4 right-4 bg-black/80 text-ufo-accent border border-ufo-accent px-4 py-2 font-mono text-sm hover:bg-ufo-accent hover:text-black transition-colors"
+              >
+                CLOSE
+              </button>
+           </div>
+        </div>
+      )}
+
       <div className={`bg-ufo-black min-h-screen text-ufo-offwhite selection:bg-ufo-accent selection:text-black transition-opacity duration-700 ${loading ? 'opacity-0' : 'opacity-100'}`}>
         <CustomCursor />
         <NoiseOverlay />
@@ -343,6 +368,7 @@ const App: React.FC = () => {
                  <ParallaxImage 
                    items={reelItems}
                    onIndexChange={handleReelChange}
+                   onImageClick={setFullscreenImage}
                    className="w-full h-full" 
                  />
                  
@@ -357,13 +383,6 @@ const App: React.FC = () => {
                  
                  <div className="absolute bottom-4 right-4 font-mono text-xs bg-black px-2 py-1 font-bold z-20 transition-colors duration-100 text-ufo-accent border border-ufo-accent/30 shadow-md">
                    {currentEvidenceLabel}
-                 </div>
-
-                 {/* Click Hint Overlay (Only on Hover) */}
-                 <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30">
-                    <div className="bg-black/60 text-white/50 font-mono text-[10px] px-2 py-0.5 tracking-widest uppercase">
-                       [ SCROLL REEL ]
-                    </div>
                  </div>
               </div>
               {/* Decorative corners - Black */}
