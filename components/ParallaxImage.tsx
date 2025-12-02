@@ -9,12 +9,27 @@ interface ParallaxImageProps {
 const ParallaxImage: React.FC<ParallaxImageProps> = ({ src, alt, className = "" }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState(0);
+  const [activeSrc, setActiveSrc] = useState(src);
   const [glitchState, setGlitchState] = useState({
     active: false,
     sliceTop: 0,
     sliceBottom: 0,
     shift: 0
   });
+
+  // Reset activeSrc when prop changes
+  useEffect(() => {
+    setActiveSrc(src);
+  }, [src]);
+
+  // Fallback handler for broken random images
+  const handleError = () => {
+    // If the random image fails, try loading the first image in the series as a fallback.
+    // We check to avoid an infinite loop if 0072 is also missing.
+    if (activeSrc !== '/images/IMG_0072.AVIF') {
+       setActiveSrc('/images/IMG_0072.AVIF');
+    }
+  };
 
   // Parallax Effect
   useEffect(() => {
@@ -69,7 +84,8 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({ src, alt, className = "" 
       
       {/* GLITCH LAYER: CYAN (Behind) - Only visible during glitch */}
       <img 
-        src={src} 
+        src={activeSrc} 
+        onError={handleError}
         alt=""
         className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-opacity duration-75 mix-blend-screen opacity-0 ${glitchState.active ? 'opacity-70' : ''}`}
         style={{ 
@@ -81,7 +97,8 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({ src, alt, className = "" 
 
       {/* GLITCH LAYER: RED (Behind) - Only visible during glitch */}
       <img 
-        src={src} 
+        src={activeSrc}
+        onError={handleError}
         alt=""
         className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-opacity duration-75 mix-blend-screen opacity-0 ${glitchState.active ? 'opacity-70' : ''}`}
         style={{ 
@@ -92,7 +109,8 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({ src, alt, className = "" 
 
       {/* MAIN IMAGE */}
       <img 
-        src={src} 
+        src={activeSrc}
+        onError={handleError}
         alt={alt}
         className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-all duration-100 ease-linear will-change-transform relative z-10`}
         style={{ 
