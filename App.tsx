@@ -28,6 +28,36 @@ const SERVICES = [
     { num: '003', title: 'HISTORY', desc: 'Retroactive continuity adjustments for timeline preservation and archival.' }
 ];
 
+// Helper to generate a "reel" of random images
+const generateReel = () => {
+    const items = [];
+    // Generate 30 items for the reel
+    for(let i = 0; i < 30; i++) {
+        const min = 72;
+        const max = 158;
+        const num = Math.floor(Math.random() * (max - min + 1)) + min;
+        const randomId = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        const randomSector = ['A', 'B', 'X', '9', 'Z', 'Q'][Math.floor(Math.random() * 6)];
+        
+        items.push({
+            image: `/images/IMG_${num.toString().padStart(4, '0')}.AVIF`,
+            label: `EVIDENCE NO. ${randomId}-${randomSector}`
+        });
+    }
+    return items;
+};
+
+// Static assets to preload
+const STATIC_ASSETS = [
+    '/images/logo.png',
+    '/images/album1.jpg',
+    '/images/album2.jpg',
+    '/images/album3.jpg',
+    '/images/album4.jpg',
+    '/images/album5.jpg',
+    '/images/album6.jpg'
+];
+
 // Interactive Service Card Component
 const ServiceItem = ({ service, index }: { service: any, index: number }) => {
   const [active, setActive] = useState(false);
@@ -86,33 +116,15 @@ const App: React.FC = () => {
   const originRef = useRef<HTMLDivElement>(null);
   const [originVisible, setOriginVisible] = useState(false);
 
-  // --- ORIGIN SECTION LOGIC (FILM STRIP) ---
-  const [reelItems, setReelItems] = useState<{image: string, label: string}[]>([]);
+  // Initialize reel items once on load so we can preload them
+  const [reelItems] = useState(() => generateReel());
   const [currentEvidenceLabel, setCurrentEvidenceLabel] = useState('EVIDENCE NO. 8492-X');
 
-  // Helper to generate a "reel" of random images
-  const generateReel = () => {
-    const items = [];
-    // Generate 30 items for the reel
-    for(let i = 0; i < 30; i++) {
-        const min = 72;
-        const max = 158;
-        const num = Math.floor(Math.random() * (max - min + 1)) + min;
-        const randomId = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-        const randomSector = ['A', 'B', 'X', '9', 'Z', 'Q'][Math.floor(Math.random() * 6)];
-        
-        items.push({
-            image: `/images/IMG_${num.toString().padStart(4, '0')}.AVIF`,
-            label: `EVIDENCE NO. ${randomId}-${randomSector}`
-        });
-    }
-    return items;
-  };
-
-  // Set initial reel on mount
-  useEffect(() => {
-    setReelItems(generateReel());
-  }, []);
+  // Combine all images for preloader
+  const [preloadList] = useState(() => [
+    ...STATIC_ASSETS,
+    ...reelItems.map(item => item.image)
+  ]);
 
   const handleReelChange = (index: number) => {
     if (reelItems[index]) {
@@ -164,7 +176,12 @@ const App: React.FC = () => {
 
   return (
     <>
-      {loading && <Preloader onComplete={() => setLoading(false)} />}
+      {loading && (
+          <Preloader 
+            onComplete={() => setLoading(false)} 
+            images={preloadList} 
+          />
+      )}
       {isCracked && <CrackedScreenOverlay onComplete={() => setIsCracked(false)} />}
       
       {/* Fullscreen Image Modal */}
@@ -418,6 +435,16 @@ const App: React.FC = () => {
 
         {/* AUDIO */}
         <SunnysmackAudio />
+
+        {/* Easter Egg Link */}
+        <div className="py-12 bg-black flex justify-center items-center border-t border-ufo-gray/30">
+           <button 
+             onClick={handleEasterEgg}
+             className="font-mono text-[10px] text-ufo-gray hover:text-red-500 tracking-[0.5em] transition-colors cursor-pointer"
+           >
+             [ DO NOT CLICK ]
+           </button>
+        </div>
 
         {/* INTELLIGENCE / SCAN */}
         <section id="intelligence" className="py-24 bg-[#050505] relative overflow-hidden">
