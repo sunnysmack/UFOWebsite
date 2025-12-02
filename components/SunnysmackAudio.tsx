@@ -77,7 +77,8 @@ const SunnysmackAudio: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
-        <RevealOnScroll className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-ufo-gray/50 pb-6">
+        {/* Changed items-end to items-start for mobile, keeping md:items-end for desktop */}
+        <RevealOnScroll className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-ufo-gray/50 pb-6">
           <div>
             <div className="flex items-center gap-3 mb-2">
                <div className="flex gap-1 h-6 items-end">
@@ -104,7 +105,8 @@ const SunnysmackAudio: React.FC = () => {
           </div>
         </RevealOnScroll>
 
-        {/* Horizontal Scroll Deck - "Wow" Factor for Mobile */}
+        {/* Horizontal Scroll Deck */}
+        {/* items-stretch is default, ensuring all cards in the row are equal height */}
         <div className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-12 pt-4 px-2 -mx-6 md:mx-0 md:px-0 scrollbar-hide">
            {/* Spacer for mobile left alignment */}
            <div className="w-2 shrink-0 md:hidden" />
@@ -112,19 +114,24 @@ const SunnysmackAudio: React.FC = () => {
            {ALBUMS.map((album, idx) => (
              <div 
                 key={idx} 
-                className="snap-center shrink-0 w-[85vw] md:w-[350px] relative group perspective-1000"
+                className="snap-center shrink-0 w-[85vw] md:w-[350px] relative group perspective-1000 h-auto"
              >
-                {/* Card Container */}
-                <div className="relative bg-[#111] border border-ufo-gray group-hover:border-ufo-accent transition-all duration-500 overflow-hidden rounded-sm hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(255,215,0,0.1)]">
+                {/* Card Container - h-full ensures it fills the flex row height, flex-col organizes internals */}
+                <div className="relative bg-[#111] border border-ufo-gray group-hover:border-ufo-accent transition-all duration-500 overflow-hidden rounded-sm hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(255,215,0,0.1)] h-full flex flex-col">
                    
                    {/* Album Art Container - SQUARE (Aspect Ratio 1:1) */}
-                   <div className="aspect-square w-full relative overflow-hidden bg-black">
+                   <div className="aspect-square w-full relative overflow-hidden bg-black shrink-0">
                       {album.cover ? (
-                         <img 
-                           src={album.cover} 
-                           alt={album.title} 
-                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                         />
+                         <>
+                           <img 
+                             src={album.cover} 
+                             alt={album.title} 
+                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 relative z-10"
+                           />
+                           {/* Holographic/Glitch Effect Overlay on Hover */}
+                           <div className="absolute inset-0 bg-ufo-accent/20 mix-blend-color-dodge opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 pointer-events-none animate-pulse" />
+                           <div className="absolute inset-0 bg-[linear-gradient(transparent_0%,rgba(255,255,255,0.1)_50%,transparent_100%)] opacity-0 group-hover:opacity-100 z-20 pointer-events-none animate-[scan_2s_linear_infinite]" style={{ backgroundSize: '100% 200%' }} />
+                         </>
                       ) : (
                          /* Fallback CSS Tape Art - Centered in Square */
                          <div className={`w-full h-full bg-gradient-to-br ${album.color} relative p-6 flex flex-col justify-center items-center`}>
@@ -151,36 +158,40 @@ const SunnysmackAudio: React.FC = () => {
                       )}
                       
                       {/* Overlay Play Button (Visible on Hover) */}
-                      <a href={album.link} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20 cursor-pointer">
+                      <a href={album.link} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-30 cursor-pointer">
                           <div className="w-16 h-16 rounded-full border border-ufo-accent bg-black/50 backdrop-blur flex items-center justify-center transform scale-50 group-hover:scale-100 transition-transform duration-300">
                                <div className="ml-1 border-y-[8px] border-y-transparent border-l-[16px] border-l-ufo-accent" />
                           </div>
                       </a>
                    </div>
 
-                   {/* Info Section */}
-                   <div className="p-6">
-                      <div className="flex justify-between items-start mb-4">
+                   {/* Info Section - Flex Grow to Fill Height */}
+                   <div className="p-6 flex flex-col flex-1">
+                      <div className="mb-4">
                         <div>
-                          <h3 className="font-sans text-xl md:text-2xl font-bold text-white group-hover:text-ufo-accent transition-colors truncate w-[200px] md:w-auto">{album.title}</h3>
-                          <p className="font-mono text-xs text-gray-500 mt-1">{album.year} • {album.duration}</p>
+                          {/* Allow title to break words and wrap naturally */}
+                          <h3 className="font-sans text-xl md:text-2xl font-bold text-white group-hover:text-ufo-accent transition-colors break-words leading-tight">
+                            {album.title}
+                          </h3>
+                          <p className="font-mono text-xs text-gray-500 mt-2">{album.year} • {album.duration}</p>
                         </div>
                       </div>
 
-                      {/* Tracklist Preview */}
-                      <div className="space-y-2 mb-6 border-t border-ufo-gray/30 pt-4">
+                      {/* Tracklist Preview - Pushes button to bottom */}
+                      <div className="space-y-2 mb-6 border-t border-ufo-gray/30 pt-4 flex-1">
                         {album.tracks.map((track, tIdx) => (
                            <div key={tIdx} className="flex justify-between items-center font-mono text-xs text-gray-400 group-hover:text-gray-300">
-                              <span>0{tIdx + 1}. {track}</span>
+                              <span className="truncate">0{tIdx + 1}. {track}</span>
                            </div>
                         ))}
                       </div>
 
+                      {/* Button at bottom */}
                       <a 
                         href={album.link}
                         target="_blank"
                         rel="noreferrer"
-                        className="block w-full text-center py-3 border border-ufo-accent/30 text-ufo-accent font-mono text-xs uppercase hover:bg-ufo-accent hover:text-black transition-colors"
+                        className="block w-full text-center py-3 border border-ufo-accent/30 text-ufo-accent font-mono text-xs uppercase hover:bg-ufo-accent hover:text-black transition-colors mt-auto"
                       >
                         Stream Transmission
                       </a>
@@ -205,6 +216,10 @@ const SunnysmackAudio: React.FC = () => {
         @keyframes equalizer {
           0%, 100% { height: 20%; }
           50% { height: 100%; }
+        }
+        @keyframes scan {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100%); }
         }
         .perspective-1000 {
           perspective: 1000px;
