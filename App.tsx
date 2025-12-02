@@ -151,17 +151,18 @@ const App: React.FC = () => {
           {/* TV Static Background */}
           <TvStaticBackground />
           
-          {/* Abstract Background Shapes - Now Green - Lower opacity to blend with static */}
+          {/* Abstract Background Shapes - Now Gold - Lower opacity to blend with static */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-ufo-gray opacity-10 animate-[spin_60s_linear_infinite]" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-dashed border-ufo-gray opacity-10 animate-[spin_40s_linear_infinite_reverse]" />
           
           <RevealOnScroll className="z-10 text-center flex flex-col items-center justify-center w-full">
-            {/* Main Hero Logo - Updated to use logo.jpeg */}
+            {/* Main Hero Logo - Updated to use logo.png */}
             <RollingLogo className="w-[75vw] h-[75vw] md:w-[340px] md:h-[340px] mb-8">
                 <img 
                   src="/images/logo.png" 
                   alt="UFO Studios" 
-                  className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] filter contrast-125" 
+                  // Updated drop shadow to Gold instead of white, also adjusted opacity to be more subtle if that was the "bg color" issue
+                  className="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(255,215,0,0.2)] filter contrast-125" 
                 />
             </RollingLogo>
           </RevealOnScroll>
@@ -212,9 +213,9 @@ const App: React.FC = () => {
                
                <div className="h-1 w-24 bg-black mb-8" />
                <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-bold">
-                 Established in 1987 by 13 year old Jason Eddie Nowak, UFO Studios is a shadowy 
-                 non-government contractor, specializing in narrative control and mass communication. 
-                 Basically, we tell stories.  Possibly your story.
+                 Established in 1987 by 13 year old Jason Eddie Nowak, under UFO Studios is a shadowy 
+                 government contractor specializing in narrative control and mass communication. 
+                 We manufacture the legends the public believes.  Basically, we tell stories.  Possibly your story.
                </p>
             </RevealOnScroll>
             
@@ -236,7 +237,7 @@ const App: React.FC = () => {
                    TOP SECRET
                  </div>
                  <div className="absolute bottom-4 right-4 font-mono text-xs bg-black text-ufo-accent px-2 py-1 font-bold z-20">
-                   FIG. 01: ART PAINTING: 7002
+                   FIG. 01: THE BUNKER: 7002
                  </div>
               </div>
               {/* Decorative corners - Black */}
@@ -289,7 +290,7 @@ const App: React.FC = () => {
               <p className="font-mono text-sm text-gray-400">SECURE LINE ESTABLISHED... ENTER TARGET TOPIC FOR ANALYSIS.</p>
             </RevealOnScroll>
 
-            <div className="bg-ufo-black border border-ufo-accent p-1 shadow-[0_0_20px_rgba(57,255,20,0.15)]">
+            <div className="bg-ufo-black border border-ufo-accent p-1 shadow-[0_0_20px_rgba(255,215,0,0.15)]">
               <div className="border border-ufo-accent/30 p-8 md:p-12 flex flex-col items-center">
                 
                 <form onSubmit={handleAiGenerate} className="w-full max-w-lg mb-8 flex gap-0">
@@ -362,7 +363,7 @@ const App: React.FC = () => {
             <div className="text-right">
                <div className="w-16 h-16 ml-auto mb-4">
                   <img 
-                    src="/images/logo.jpeg" 
+                    src="/images/logo.png" 
                     alt="UFO Studios" 
                     className="w-full h-full object-contain opacity-50 hover:opacity-100 transition-opacity" 
                   />
