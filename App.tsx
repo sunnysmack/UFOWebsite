@@ -107,8 +107,8 @@ const App: React.FC = () => {
   // Easter Egg State
   const [isCracked, setIsCracked] = useState(false);
   
-  // Fullscreen Image State
-  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+  // Fullscreen Image State (Index based now)
+  const [fullscreenIndex, setFullscreenIndex] = useState<number | null>(null);
 
   // Ref and state for the lighting transition on the Origin section
   const originRef = useRef<HTMLDivElement>(null);
@@ -138,9 +138,31 @@ const App: React.FC = () => {
     setIsCracked(true);
   };
 
-  const closeFullscreen = () => {
-    setFullscreenImage(null);
+  // Fullscreen Navigation Logic
+  const closeFullscreen = () => setFullscreenIndex(null);
+  
+  const nextImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setFullscreenIndex(prev => prev !== null ? (prev + 1) % reelItems.length : null);
   };
+
+  const prevImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setFullscreenIndex(prev => prev !== null ? (prev - 1 + reelItems.length) % reelItems.length : null);
+  };
+
+  // Keyboard navigation for gallery
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (fullscreenIndex === null) return;
+      if (e.key === 'ArrowRight') nextImage();
+      if (e.key === 'ArrowLeft') prevImage();
+      if (e.key === 'Escape') closeFullscreen();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [fullscreenIndex]);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -182,31 +204,81 @@ const App: React.FC = () => {
       )}
       {isCracked && <CrackedScreenOverlay onComplete={() => setIsCracked(false)} />}
       
-      {/* Fullscreen Image Modal */}
-      {fullscreenImage && (
+      {/* Fullscreen Image Modal - Updated with Frame and Navigation */}
+      {fullscreenIndex !== null && (
         <div 
-          className="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center p-4 animate-in fade-in duration-300"
+          className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300"
           onClick={closeFullscreen}
         >
-           {/* Image Container - Warm White Glow added here - Opacity 100% background above */}
-           <div 
-             className="relative max-w-full max-h-[70vh] shadow-[0_0_100px_rgba(255,225,200,0.3)] rounded-sm transition-all duration-500" 
-             onClick={(e) => e.stopPropagation()}
-           >
-                <img 
-                  src={fullscreenImage} 
-                  alt="Evidence" 
-                  className="max-h-[70vh] max-w-[90vw] object-contain rounded-sm" 
-                />
+           {/* Main Container */}
+           <div className="flex items-center justify-center w-full h-full p-4 md:p-10 gap-4">
+              
+              {/* Previous Button (Hidden on tiny screens, can use tap/swipe later if needed, mostly for desktop/tablet) */}
+              <button 
+                onClick={prevImage}
+                className="hidden md:flex flex-col items-center justify-center w-12 h-24 border border-ufo-gray hover:bg-white hover:text-black hover:border-white transition-all text-white font-mono text-2xl z-50"
+              >
+                &lt;
+              </button>
+
+              {/* Framed Image Container */}
+              <div 
+                 className="relative max-w-full max-h-[85vh] transition-all duration-300 select-none" 
+                 onClick={(e) => e.stopPropagation()}
+               >
+                  {/* The Frame */}
+                  <div className="bg-white p-2 md:p-4 pb-12 md:pb-16 shadow-[0_0_50px_rgba(0,0,0,0.8)] rotate-1 transform transition-transform hover:rotate-0 duration-500">
+                      
+                      {/* Inner Image Wrapper */}
+                      <div className="relative bg-black overflow-hidden border border-gray-200">
+                          <img 
+                            src={reelItems[fullscreenIndex].image} 
+                            alt="Evidence" 
+                            className="max-h-[70vh] max-w-[85vw] md:max-w-[70vw] object-contain" 
+                          />
+                          {/* Permanent Scanlines on Fullscreen too */}
+                          <div className="absolute inset-0 pointer-events-none z-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.2)_50%)] bg-[length:100%_4px]" />
+                      </div>
+
+                      {/* Label on Frame */}
+                      <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end font-mono text-black">
+                          <div>
+                             <span className="block text-[10px] uppercase tracking-widest opacity-50">EVIDENCE #{fullscreenIndex + 100}</span>
+                             <span className="text-xs md:text-sm font-bold tracking-tighter">PROJECT: FINGERPAINT</span>
+                          </div>
+                          <div className="text-[10px] opacity-40">
+                             CONFIDENTIAL
+                          </div>
+                      </div>
+
+                      {/* Paper Texture Overlay for Frame */}
+                      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-noise mix-blend-multiply" />
+                  </div>
+              </div>
+
+              {/* Next Button */}
+              <button 
+                onClick={nextImage}
+                className="hidden md:flex flex-col items-center justify-center w-12 h-24 border border-ufo-gray hover:bg-white hover:text-black hover:border-white transition-all text-white font-mono text-2xl z-50"
+              >
+                &gt;
+              </button>
            </div>
 
-           {/* Controls Row - Below Image */}
-           <div className="flex gap-4 mt-8 z-50" onClick={(e) => e.stopPropagation()}>
+           {/* Mobile Navigation Bar (Bottom) */}
+           <div className="md:hidden flex gap-4 mt-auto mb-8 z-50 w-full justify-center px-4" onClick={(e) => e.stopPropagation()}>
+              <button onClick={prevImage} className="flex-1 bg-white text-black py-4 font-mono text-xl active:bg-gray-300">&lt;</button>
+              <button onClick={closeFullscreen} className="flex-[2] bg-ufo-accent text-black py-4 font-mono text-sm tracking-widest font-bold uppercase active:bg-yellow-600">Close File</button>
+              <button onClick={nextImage} className="flex-1 bg-white text-black py-4 font-mono text-xl active:bg-gray-300">&gt;</button>
+           </div>
+           
+           {/* Desktop Close Button */}
+           <div className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 gap-4 z-50" onClick={(e) => e.stopPropagation()}>
               <button 
                 onClick={closeFullscreen}
-                className="bg-black text-white border border-white/30 px-6 py-3 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-all uppercase"
+                className="bg-black text-white border border-white/30 px-8 py-3 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-all uppercase"
               >
-                [ Close ]
+                [ Close File ]
               </button>
            </div>
         </div>
@@ -402,7 +474,7 @@ const App: React.FC = () => {
                      items={reelItems} 
                      className="h-full w-full"
                      onIndexChange={handleReelChange}
-                     onImageClick={(img) => setFullscreenImage(img)}
+                     onImageClick={(idx) => setFullscreenIndex(idx)}
                    />
                    
                    {/* Decorative "Tape" */}
