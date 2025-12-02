@@ -97,13 +97,13 @@ const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
       () => "CHECKING MEMORY... 128KB OK",
       () => "ENTERING UFO.. OK",
       () => "MOUNTING FILE SYSTEM...",
-      () => `VISITOR HARDWARE... ${userDataRef.current.device}`,
-      () => "ESTABLISHING SECURE CONNECTION...",
-      () => "SECURING SIGNAL SOURCE...",
-      () => `TARGET IDENTIFIED: ${userDataRef.current.city}, ${userDataRef.current.country}`,
+      () => `${userDataRef.current.device}`,
+      () => "SECURE CONNECTION...",
+      () => "SECURING TARGET...",
+      () => `${userDataRef.current.city}, ${userDataRef.current.country}`,
       () => "TRANSMITTING BEACON TO UFO...",
-      () => "DECRYPTING ASSETS...",
-      () => "SYSTEM READY."
+      () => "HANDSHAKE...",
+      () => "SYSTEM READY!"
     ];
 
     let currentIndex = 0;
