@@ -93,15 +93,15 @@ const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
 
     // 3. Boot Sequence Definition
     const sequence = [
-      () => "INITIALIZING BIOS...",
-      () => "CHECKING MEMORY... 64KB OK",
-      () => "LOADING KERNEL... OK",
+      () => "INITIALIZING...",
+      () => "CHECKING MEMORY... 128KB OK",
+      () => "ENTERING UFO.. OK",
       () => "MOUNTING FILE SYSTEM...",
-      () => `DETECTING HARDWARE... ${userDataRef.current.device}`,
+      () => `VISITOR HARDWARE... ${userDataRef.current.device}`,
       () => "ESTABLISHING SECURE CONNECTION...",
-      () => "TRACING SIGNAL SOURCE...",
+      () => "SECURING SIGNAL SOURCE...",
       () => `TARGET IDENTIFIED: ${userDataRef.current.city}, ${userDataRef.current.country}`,
-      () => "TRANSMITTING BEACON TO HQ...",
+      () => "TRANSMITTING BEACON TO UFO...",
       () => "DECRYPTING ASSETS...",
       () => "SYSTEM READY."
     ];
