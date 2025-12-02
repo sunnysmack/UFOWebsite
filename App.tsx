@@ -140,9 +140,7 @@ const App: React.FC = () => {
                 <img 
                   src="/images/logo.png" 
                   alt="UFO Studios" 
-                  // mix-blend-screen handles background removal if the logo has a black background
-                  // Removed drop-shadow as it can create a boxy artifact if transparency isn't perfect
-                  className="w-full h-full object-contain mix-blend-screen filter contrast-125" 
+                  className="w-full h-full object-contain" 
                 />
             </RollingLogo>
           </RevealOnScroll>
@@ -193,7 +191,7 @@ const App: React.FC = () => {
                
                <div className="h-1 w-24 bg-black mb-8" />
                <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-bold">
-                 Established: 1987 in the bedroom of 13 year old Jason Eddie Nowak, UFO Studios is a shadowy 
+                 Established in the bedroom of 13 year old Jason Eddie Nowak during the summer of 1987, UFO Studios is a shadowy 
                  "non-government" contractor, specializing in narrative control and mass communication. 
                 Basically, we tell stories.  Possibly your story. Let's Make Up. 
                </p>
@@ -217,7 +215,7 @@ const App: React.FC = () => {
                    TOP SECRET
                  </div>
                  <div className="absolute bottom-4 right-4 font-mono text-xs bg-black text-ufo-accent px-2 py-1 font-bold z-20">
-                   FIG. xx: ART HEIST
+                   FIG. XX: ART HEIST
                  </div>
               </div>
               {/* Decorative corners - Black */}
