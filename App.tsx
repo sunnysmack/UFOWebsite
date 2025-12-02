@@ -23,10 +23,9 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const SERVICES = [
-    { num: '001', title: 'MEMETIC WARFARE', desc: 'Deploying viral thought-forms to destabilize consensus reality.' },
-    { num: '002', title: 'TEMPORAL INSERTION', desc: 'Retroactive continuity adjustments for timeline preservation.' },
-    { num: '003', title: 'SIGNAL INTELLIGENCE', desc: 'Decryption of interstellar static and void transmissions.' },
-    { num: '004', title: 'BIOLOGICAL MIMICRY', desc: 'Advanced synthesis of organic camouflage for field agents.' }
+    { num: '001', title: 'PROPAGANDA', desc: 'Deploying viral thought-forms to destabilize consensus reality.' },
+    { num: '002', title: 'COUNTER INTEL', desc: 'Decryption of interstellar static and neutralization of unauthorized signals.' },
+    { num: '003', title: 'HISTORY', desc: 'Retroactive continuity adjustments for timeline preservation and archival.' }
 ];
 
 // Interactive Service Card Component
@@ -52,11 +51,11 @@ const ServiceItem = ({ service, index }: { service: any, index: number }) => {
            <div className="w-2 h-2 bg-ufo-accent rounded-full animate-ping" />
          </div>
 
-         {/* Static Overlay - Only active when clicked - Removed CLASSIFIED text */}
+         {/* Active Static Effect - Removed Overlay Container */}
          {active && (
-           <div className="absolute inset-0 z-30 animate-in fade-in duration-75">
-             <TvStaticBackground className="opacity-90 mix-blend-hard-light" />
-           </div>
+            <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
+                <TvStaticBackground />
+            </div>
          )}
 
          <div className="relative z-10">
@@ -355,7 +354,7 @@ const App: React.FC = () => {
                {/* Text is Black for contrast against White BG */}
                <div className="mb-8">
                 <ScrambleText 
-                  text="ART FILES" 
+                  text="ORIGIN: 7ASON" 
                   as="h2" 
                   className="font-sans text-5xl md:text-7xl font-bold leading-[0.9] text-ufo-black lining-nums" 
                 />
@@ -363,10 +362,7 @@ const App: React.FC = () => {
                
                <div className="h-1 w-24 bg-black mb-8" />
                <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-bold mb-8">
-                 WE ARE THE SIGNAL IN THE STATIC.
-               </p>
-               <p className="font-mono text-sm text-black/60 leading-relaxed max-w-lg mb-8">
-                 UFO Studios is an independent creative outpost transmitting from an undisclosed location. We specialize in sonic weaponry, visual anomalies, and temporal distortion.
+                 Established in the bedroom of 13 year old Jason Eddie Nowak during the summer of 1987, UFO Studios is a shadowy "non-government" contractor, specializing in narrative control and mass communication. Basically, we tell stories. Possibly your story. Let's Make Stuff.
                </p>
 
                {/* Easter Egg Trigger */}
