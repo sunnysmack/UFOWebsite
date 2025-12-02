@@ -14,8 +14,8 @@ import CrackedScreenOverlay from './components/CrackedScreenOverlay';
 import { NavItem } from './types';
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'CLASSIFIED', href: '#origin' },
-  { label: 'OPERATIONS', href: '#services' },
+  { label: 'ART FILES', href: '#origin' },
+  { label: 'PROTOCOLS', href: '#services' },
   { label: 'TIMETRUCK', href: '#timetruck' },
   { label: 'AUDIO', href: '#audio' },
   { label: 'SECTOR SCAN', href: '#intelligence' },
@@ -52,15 +52,10 @@ const ServiceItem = ({ service, index }: { service: any, index: number }) => {
            <div className="w-2 h-2 bg-ufo-accent rounded-full animate-ping" />
          </div>
 
-         {/* Static Overlay - Only active when clicked */}
+         {/* Static Overlay - Only active when clicked - Removed CLASSIFIED text */}
          {active && (
            <div className="absolute inset-0 z-30 animate-in fade-in duration-75">
              <TvStaticBackground className="opacity-90 mix-blend-hard-light" />
-             <div className="absolute inset-0 flex items-center justify-center">
-                 <div className="bg-black/80 px-4 py-2 border border-ufo-accent transform -rotate-12 shadow-[0_0_15px_rgba(255,215,0,0.3)]">
-                     <span className="font-mono text-ufo-accent text-lg font-bold tracking-widest blink">CLASSIFIED</span>
-                 </div>
-             </div>
            </div>
          )}
 
@@ -360,7 +355,7 @@ const App: React.FC = () => {
                {/* Text is Black for contrast against White BG */}
                <div className="mb-8">
                 <ScrambleText 
-                  text="CLASSIFIED" 
+                  text="ART FILES" 
                   as="h2" 
                   className="font-sans text-5xl md:text-7xl font-bold leading-[0.9] text-ufo-black lining-nums" 
                 />
@@ -410,7 +405,7 @@ const App: React.FC = () => {
         <section id="services" className="py-24 bg-ufo-black border-t border-ufo-gray/30">
           <div className="container mx-auto px-6">
             <RevealOnScroll className="mb-16">
-              <ScrambleText text="OPERATIONS" as="h2" className="font-sans text-4xl md:text-6xl font-bold text-white mb-4" />
+              <ScrambleText text="PROTOCOLS" as="h2" className="font-sans text-4xl md:text-6xl font-bold text-white mb-4" />
               <div className="w-full h-[1px] bg-ufo-gray opacity-30" />
             </RevealOnScroll>
 
