@@ -4,7 +4,7 @@ interface ParallaxImageProps {
   items: { image: string, label: string }[];
   className?: string;
   onIndexChange?: (index: number) => void;
-  onImageClick?: (image: string) => void;
+  onImageClick?: (index: number) => void;
 }
 
 // Sub-component for individual image with glitch logic
@@ -159,7 +159,7 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({
         {items.map((item, idx) => (
           <div 
             key={idx} 
-            onClick={() => onImageClick?.(item.image)}
+            onClick={() => onImageClick?.(idx)}
             className="w-full h-full snap-center shrink-0 relative flex items-center justify-center bg-black overflow-hidden cursor-zoom-in group"
           >
              <GlitchImage src={item.image} alt={`Evidence ${idx}`} isActive={activeIndex === idx} />
