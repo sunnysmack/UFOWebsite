@@ -39,14 +39,23 @@ const TvStaticBackground: React.FC = () => {
         ctx.fillRect(0, i, w, 2);
       }
       
-      // Vignette
-      const gradient = ctx.createRadialGradient(w / 2, h / 2, h / 3, w / 2, h / 2, h);
-      gradient.addColorStop(0, 'rgba(0,0,0,0)');
-      gradient.addColorStop(1, 'rgba(0,0,0,0.8)');
-      ctx.fillStyle = gradient; // We can't directly use gradient as fillStyle over putImageData easily without globalCompositeOperation or drawing a rect
+      // 1. Center Glow (Brighter static near logo)
+      // We draw a white radial gradient with 'screen' blend mode to boost brightness in center
+      const centerGlow = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, h / 2);
+      centerGlow.addColorStop(0, 'rgba(255, 255, 255, 0.15)'); // Subtle white glow at center
+      centerGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
       
-      // Since putImageData overwrites, we draw effects after
-      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalCompositeOperation = 'screen';
+      ctx.fillStyle = centerGlow;
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. Vignette (Darken edges)
+      const vignette = ctx.createRadialGradient(w / 2, h / 2, h / 3, w / 2, h / 2, h);
+      vignette.addColorStop(0, 'rgba(0,0,0,0)');
+      vignette.addColorStop(1, 'rgba(0,0,0,0.8)');
+      
+      ctx.globalCompositeOperation = 'source-over'; // Reset blend mode
+      ctx.fillStyle = vignette; 
       ctx.fillRect(0, 0, w, h);
 
       animationFrameId = requestAnimationFrame(draw);
