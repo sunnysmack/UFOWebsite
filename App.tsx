@@ -10,6 +10,7 @@ import Preloader from './components/Preloader';
 import VisualThreatAssessment from './components/VisualThreatAssessment';
 import Timetruck from './components/Timetruck';
 import SunnysmackAudio from './components/SunnysmackAudio';
+import CrackedScreenOverlay from './components/CrackedScreenOverlay';
 import { animateImage } from './services/geminiService';
 import { NavItem } from './types';
 
@@ -22,10 +23,61 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'COMMS', href: '#contact' }
 ];
 
+// Interactive Service Card Component
+const ServiceItem = ({ service, index }: { service: any, index: number }) => {
+  const [active, setActive] = useState(false);
+
+  const triggerStatic = () => {
+    if (active) return;
+    setActive(true);
+    if (navigator.vibrate) navigator.vibrate(30);
+    // Static effect duration
+    setTimeout(() => setActive(false), 1200);
+  };
+
+  return (
+    <RevealOnScroll delay={index * 150} threshold={0.2}>
+       <div 
+         onClick={triggerStatic}
+         className="group border border-ufo-gray p-8 hover:bg-ufo-gray/10 hover:border-ufo-accent transition-all duration-300 h-full flex flex-col justify-between min-h-[300px] relative overflow-hidden cursor-pointer select-none"
+       >
+         {/* Ping Indicator */}
+         <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+           <div className="w-2 h-2 bg-ufo-accent rounded-full animate-ping" />
+         </div>
+
+         {/* Static Overlay - Only active when clicked */}
+         {active && (
+           <div className="absolute inset-0 z-30 animate-in fade-in duration-75">
+             <TvStaticBackground className="opacity-90 mix-blend-hard-light" />
+             <div className="absolute inset-0 flex items-center justify-center">
+                 <div className="bg-black/80 px-4 py-2 border border-ufo-accent transform -rotate-12 shadow-[0_0_15px_rgba(255,215,0,0.3)]">
+                     <span className="font-mono text-ufo-accent text-lg font-bold tracking-widest blink">CLASSIFIED</span>
+                 </div>
+             </div>
+           </div>
+         )}
+
+         <div className="relative z-10">
+           <span className="font-mono text-xs opacity-50 mb-4 block text-ufo-accent">FILE NO. {service.num}</span>
+           <h3 className="font-sans text-2xl font-bold mb-4 text-ufo-offwhite group-hover:text-ufo-accent transition-colors">{service.title}</h3>
+           <p className="font-mono text-sm opacity-80 leading-relaxed group-hover:text-white">
+             {service.desc}
+           </p>
+         </div>
+         <div className="w-full h-[1px] bg-ufo-gray mt-8 group-hover:bg-ufo-accent transition-colors relative z-10" />
+       </div>
+    </RevealOnScroll>
+  );
+};
+
 const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  
+  // Easter Egg State
+  const [isCracked, setIsCracked] = useState(false);
   
   // Ref and state for the lighting transition on the Origin section
   const originRef = useRef<HTMLDivElement>(null);
@@ -190,6 +242,14 @@ const App: React.FC = () => {
         setOriginState(prev => ({ ...prev, isCycling: false, label: 'ERROR' }));
     }
   };
+  
+  const handleEasterEgg = () => {
+    if (navigator.vibrate) {
+        // Intense vibration pattern: Short sharp pulses then a long decay
+        navigator.vibrate([100, 30, 100, 30, 500, 50, 500]);
+    }
+    setIsCracked(true);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -224,6 +284,7 @@ const App: React.FC = () => {
   return (
     <>
       {loading && <Preloader onComplete={() => setLoading(false)} />}
+      {isCracked && <CrackedScreenOverlay onComplete={() => setIsCracked(false)} />}
       
       <div className={`bg-ufo-black min-h-screen text-ufo-offwhite selection:bg-ufo-accent selection:text-black transition-opacity duration-700 ${loading ? 'opacity-0' : 'opacity-100'}`}>
         <CustomCursor />
@@ -466,25 +527,11 @@ const App: React.FC = () => {
 
             <div className="grid md:grid-cols-3 gap-8">
                {[
-                 { title: 'PROPAGANDA', desc: 'Social engineering and viral deployment. We control the narrative before it spreads.', num: '01' },
-                 { title: 'COUNTER INTEL', desc: 'Visual design that confuses, captivates, and commands attention.', num: '02' },
-                 { title: 'HISTORY REVISION', desc: 'Brand narrative construction. We write the past to secure your future.', num: '03' }
+                 { title: 'PROPAGANDA', desc: 'Social engineering and viral deployment. We will paint your picture.  We will deliver your message.', num: '01' },
+                 { title: 'COUNTER INTEL', desc: 'Visual design that confuses, captivates, and commands attention.  Your enemies immediately become ours.', num: '02' },
+                 { title: 'HISTORY REVISION', desc: 'Brand narrative construction. We have been in this business since the 20th century.  No lie.', num: '03' }
                ].map((service, idx) => (
-                 <RevealOnScroll key={idx} delay={idx * 150} threshold={0.2}>
-                   <div className="group border border-ufo-gray p-8 hover:bg-ufo-gray/10 hover:border-ufo-accent transition-all duration-300 h-full flex flex-col justify-between min-h-[300px] relative overflow-hidden">
-                     <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                       <div className="w-2 h-2 bg-ufo-accent rounded-full animate-ping" />
-                     </div>
-                     <div>
-                       <span className="font-mono text-xs opacity-50 mb-4 block text-ufo-accent">FILE NO. {service.num}</span>
-                       <h3 className="font-sans text-2xl font-bold mb-4 text-ufo-offwhite group-hover:text-ufo-accent transition-colors">{service.title}</h3>
-                       <p className="font-mono text-sm opacity-80 leading-relaxed group-hover:text-white">
-                         {service.desc}
-                       </p>
-                     </div>
-                     <div className="w-full h-[1px] bg-ufo-gray mt-8 group-hover:bg-ufo-accent transition-colors" />
-                   </div>
-                 </RevealOnScroll>
+                 <ServiceItem key={idx} service={service} index={idx} />
                ))}
             </div>
           </div>
@@ -526,8 +573,11 @@ const App: React.FC = () => {
               </p>
             </div>
 
-            <div className="text-right">
-               <div className="w-16 h-16 ml-auto mb-4">
+            <div className="text-left md:text-right w-full md:w-auto">
+               <div 
+                 className="w-16 h-16 mr-auto md:ml-auto md:mr-0 mb-4 cursor-pointer hover:scale-110 transition-transform duration-300"
+                 onClick={handleEasterEgg}
+               >
                   <img 
                     src="/images/logo.png" 
                     alt="UFO Studios" 
