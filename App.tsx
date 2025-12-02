@@ -229,7 +229,7 @@ const App: React.FC = () => {
                {/* Text is Black for contrast against White BG */}
                <div className="mb-8">
                 <ScrambleText 
-                  text="ORIGIN: 7ASON" 
+                  text="ORIGIN: JASON" 
                   as="h2" 
                   className="font-sans text-5xl md:text-7xl font-bold leading-[0.9] text-ufo-black" 
                 />
