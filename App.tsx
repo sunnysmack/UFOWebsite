@@ -7,14 +7,13 @@ import TvStaticBackground from './components/TvStaticBackground';
 import RollingLogo from './components/RollingLogo';
 import ScrambleText from './components/ScrambleText';
 import Preloader from './components/Preloader';
-import { generateAlienSlogan } from './services/geminiService';
-import { LoadingState, AlienResponse } from './types';
+import VisualThreatAssessment from './components/VisualThreatAssessment';
 import { NavItem } from './types';
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'CLASSIFIED', href: '#origin' },
   { label: 'OPERATIONS', href: '#services' },
-  { label: 'INTELLIGENCE', href: '#intelligence' },
+  { label: 'SECTOR SCAN', href: '#intelligence' },
   { label: 'COMMS', href: '#contact' }
 ];
 
@@ -22,9 +21,6 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [prompt, setPrompt] = useState('');
-  const [aiState, setAiState] = useState<LoadingState>(LoadingState.IDLE);
-  const [aiResponse, setAiResponse] = useState<AlienResponse | null>(null);
   
   // Ref and state for the lighting transition on the Origin section
   const originRef = useRef<HTMLDivElement>(null);
@@ -62,27 +58,6 @@ const App: React.FC = () => {
     }
     return () => observer.disconnect();
   }, []);
-
-  const handleAiGenerate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!prompt.trim()) return;
-
-    // Haptic feedback for mobile
-    if (navigator.vibrate) navigator.vibrate(20);
-
-    setAiState(LoadingState.LOADING);
-    setAiResponse(null);
-
-    try {
-      const result = await generateAlienSlogan(prompt);
-      setAiResponse(result);
-      setAiState(LoadingState.SUCCESS);
-      if (navigator.vibrate) navigator.vibrate([10, 50, 10]); // Success vibration pattern
-    } catch (error) {
-      setAiState(LoadingState.ERROR);
-      if (navigator.vibrate) navigator.vibrate(100); // Error vibration
-    }
-  };
 
   const toggleMenu = () => {
     if (navigator.vibrate) navigator.vibrate(10);
@@ -281,66 +256,17 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* ALIEN INTELLIGENCE (GEMINI DEMO) */}
+        {/* SECTOR SCAN (VISUAL THREAT ASSESSMENT) */}
         <section id="intelligence" className="py-24 px-6 relative overflow-hidden">
           <div className="absolute inset-0 bg-ufo-accent/5" />
           <div className="container mx-auto max-w-4xl relative z-10">
             <RevealOnScroll className="text-center mb-12">
-              <ScrambleText text="STRATEGIC COMMAND_AI" as="h2" className="font-sans text-4xl md:text-5xl font-bold mb-4" />
-              <p className="font-mono text-sm text-gray-400">SECURE LINE ESTABLISHED... ENTER TARGET TOPIC FOR ANALYSIS.</p>
+              <ScrambleText text="SECTOR SCAN" as="h2" className="font-sans text-4xl md:text-5xl font-bold mb-4" />
+              <p className="font-mono text-sm text-gray-400">UPLOAD VISUAL TELEMETRY. IDENTIFY HIDDEN THREATS.</p>
             </RevealOnScroll>
 
-            <div className="bg-ufo-black border border-ufo-accent p-1 shadow-[0_0_20px_rgba(255,215,0,0.15)]">
-              <div className="border border-ufo-accent/30 p-8 md:p-12 flex flex-col items-center">
-                
-                <form onSubmit={handleAiGenerate} className="w-full max-w-lg mb-8 flex gap-0">
-                  <input 
-                    type="text" 
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="SUBJECT: E.g., SURVEILLANCE DRONES"
-                    className="flex-1 bg-transparent border-b border-ufo-gray py-4 px-2 font-mono text-lg focus:outline-none focus:border-ufo-accent focus:bg-ufo-accent/5 transition-all placeholder:text-gray-700 text-ufo-accent"
-                  />
-                  <button 
-                    type="submit"
-                    disabled={aiState === LoadingState.LOADING}
-                    className="bg-ufo-accent text-black font-mono font-bold px-6 py-4 hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
-                  >
-                    {aiState === LoadingState.LOADING ? 'ENCRYPTING...' : 'SUBMIT'}
-                  </button>
-                </form>
-
-                {/* Output Area */}
-                <div className="w-full min-h-[200px] flex items-center justify-center text-center">
-                  {aiState === LoadingState.IDLE && (
-                     <span className="font-mono text-xs text-ufo-accent/50 blink">AWAITING CLASSIFIED DATA_</span>
-                  )}
-                  
-                  {aiState === LoadingState.ERROR && (
-                     <span className="font-mono text-red-500">ERROR: SECURITY BREACH DETECTED.</span>
-                  )}
-
-                  {aiState === LoadingState.SUCCESS && aiResponse && (
-                    <div className="animate-in fade-in zoom-in duration-500 w-full">
-                      <div className="flex justify-center mb-4">
-                          <span className="border border-ufo-accent text-ufo-accent px-2 py-1 text-xs font-mono tracking-widest">DECLASSIFIED</span>
-                      </div>
-                      <ScrambleText 
-                        text={`"${aiResponse.slogan}"`}
-                        as="h3"
-                        className="font-sans text-3xl md:text-5xl font-bold mb-6 text-ufo-offwhite leading-tight uppercase"
-                      />
-                      <div className="inline-block border border-ufo-gray px-4 py-2 bg-ufo-gray/20">
-                        <p className="font-mono text-xs md:text-sm text-gray-400">
-                          STRATEGIC RATIONALE: {aiResponse.rationale}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-              </div>
-            </div>
+            <VisualThreatAssessment />
+            
           </div>
         </section>
 
