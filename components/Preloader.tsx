@@ -1,17 +1,68 @@
 import React, { useEffect, useState, useRef } from 'react';
 
+// -----------------------------------------------------------------------------
+// NOTIFICATION SETUP (OPTIONAL)
+// To get instant alerts on your phone when someone visits:
+// 1. Create a Discord Server (it's free).
+// 2. Go to Server Settings -> Integrations -> Webhooks -> New Webhook.
+// 3. Copy the 'Webhook URL'.
+// 4. Paste it inside the quotes below.
+// -----------------------------------------------------------------------------
+const WEBHOOK_URL = ""; 
+
 const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [lines, setLines] = useState<string[]>([]);
   const [isExiting, setIsExiting] = useState(false);
   
-  // Use a ref to store data so we can access updated values inside the interval closure
-  // without triggering re-renders or dependency issues
+  // Ref ensures we don't send duplicate notifications if re-renders happen
+  const notificationSentRef = useRef(false);
+  
   const userDataRef = useRef({
     city: 'UNKNOWN SECTOR',
     country: 'UNKNOWN REGION',
     device: 'UNIDENTIFIED TERMINAL',
-    ip: '::1'
+    ip: '::1',
+    userAgent: navigator.userAgent
   });
+
+  const sendNotification = async () => {
+    if (notificationSentRef.current) return;
+    notificationSentRef.current = true;
+
+    if (!WEBHOOK_URL) {
+      console.log("Visitor Log (Configure WEBHOOK_URL in Preloader.tsx to receive this on phone):", userDataRef.current);
+      return;
+    }
+
+    try {
+      const { city, country, ip, device, userAgent } = userDataRef.current;
+      
+      // Send data to Discord Webhook
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: "UFO STUDIOS SECURITY",
+          avatar_url: "https://ufostudios.us/logo.png", // Ensure this path is valid in prod
+          content: "🚨 **INTRUSION DETECTED**",
+          embeds: [{
+            title: "New Visitor Logged",
+            color: 16766720, // Gold color
+            fields: [
+              { name: "Location", value: `${city}, ${country}`, inline: true },
+              { name: "IP Address", value: ip, inline: true },
+              { name: "Device", value: device, inline: true },
+              { name: "Time", value: new Date().toLocaleString(), inline: false },
+              { name: "User Agent", value: `\`${userAgent}\``, inline: false }
+            ],
+            footer: { text: "UFO STUDIOS • SECURE CHANNEL" }
+          }]
+        })
+      });
+    } catch (err) {
+      console.error("Failed to transmit beacon:", err);
+    }
+  };
 
   useEffect(() => {
     // 1. Hardware Detection (User Agent)
@@ -24,31 +75,34 @@ const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
     else if (ua.match(/Linux/i)) userDataRef.current.device = "LINUX NODE";
     
     // 2. Network Trace (IP Geolocation)
-    // Using a free IP API to get location data. 
-    // If this fails (e.g. adblockers), it gracefully falls back to defaults.
     fetch('https://ipapi.co/json/')
       .then(res => res.json())
       .then(data => {
         if (data.city) userDataRef.current.city = data.city.toUpperCase();
         if (data.country_name) userDataRef.current.country = data.country_name.toUpperCase();
         if (data.ip) userDataRef.current.ip = data.ip;
+
+        // Trigger notification AFTER we have the location
+        sendNotification();
       })
       .catch(err => {
         console.log("Trace blocked by firewall", err);
+        // Send whatever data we have even if location failed
+        sendNotification();
       });
 
     // 3. Boot Sequence Definition
-    // We use functions here so they evaluate the ref at the moment they are called
     const sequence = [
       () => "INITIALIZING BIOS...",
       () => "CHECKING MEMORY... 64KB OK",
-      () => "CONNECTION... OK",
-      () => "ENTERING UFO: SECURE...",
+      () => "LOADING KERNEL... OK",
+      () => "MOUNTING FILE SYSTEM...",
       () => `DETECTING HARDWARE... ${userDataRef.current.device}`,
-      () => "ESTABLISHING CONNECTION...",
+      () => "ESTABLISHING SECURE CONNECTION...",
       () => "TRACING SIGNAL SOURCE...",
       () => `TARGET IDENTIFIED: ${userDataRef.current.city}, ${userDataRef.current.country}`,
-      () => "ACCRESS GRANTED...",
+      () => "TRANSMITTING BEACON TO HQ...",
+      () => "DECRYPTING ASSETS...",
       () => "SYSTEM READY."
     ];
 
@@ -78,7 +132,7 @@ const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
     <div 
         className={`fixed inset-0 z-[9999] bg-black flex items-end pb-20 pl-10 transition-opacity duration-1000 ${isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
     >
-      <div className="font-mono text-ufo-accent text-sm md:text-lg leading-relaxed">
+      <div className="font-mono text-ufo-accent text-xs md:text-sm leading-relaxed">
         {lines.map((line, i) => (
           <div key={i} className="mb-1">
             <span className="opacity-50 mr-2">[{new Date().toLocaleTimeString()}]</span>
