@@ -82,139 +82,41 @@ const App: React.FC = () => {
   const originRef = useRef<HTMLDivElement>(null);
   const [originVisible, setOriginVisible] = useState(false);
 
-  // --- SWIPE LOGIC STATE ---
-  const [dragStart, setDragStart] = useState<number | null>(null);
-  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  // --- ORIGIN SECTION LOGIC (FILM STRIP) ---
+  const [reelItems, setReelItems] = useState<{image: string, label: string}[]>([]);
+  const [currentEvidenceLabel, setCurrentEvidenceLabel] = useState('EVIDENCE NO. 8492-X');
 
-  // --- ORIGIN SECTION LOGIC ---
-  const [originState, setOriginState] = useState({
-    image: '/images/IMG_0072.AVIF',
-    label: 'EVIDENCE NO. 8492-X',
-    isCycling: false, // NOW REPRESENTS THE "SLOT MACHINE" EFFECT
-  });
-
-  // Helper to generate random image data
-  const getRandomOriginData = () => {
-    const min = 72;
-    const max = 158;
-    const num = Math.floor(Math.random() * (max - min + 1)) + min;
-    const randomId = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    const randomSector = ['A', 'B', 'X', '9', 'Z', 'Q'][Math.floor(Math.random() * 6)];
-    
-    return {
-      image: `/images/IMG_${num.toString().padStart(4, '0')}.AVIF`,
-      label: `EVIDENCE NO. ${randomId}-${randomSector}`
-    };
+  // Helper to generate a "reel" of random images
+  const generateReel = () => {
+    const items = [];
+    // Generate 30 items for the reel
+    for(let i = 0; i < 30; i++) {
+        const min = 72;
+        const max = 158;
+        const num = Math.floor(Math.random() * (max - min + 1)) + min;
+        const randomId = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        const randomSector = ['A', 'B', 'X', '9', 'Z', 'Q'][Math.floor(Math.random() * 6)];
+        
+        items.push({
+            image: `/images/IMG_${num.toString().padStart(4, '0')}.AVIF`,
+            label: `EVIDENCE NO. ${randomId}-${randomSector}`
+        });
+    }
+    return items;
   };
 
-  // Set initial random image on mount
+  // Set initial reel on mount
   useEffect(() => {
-    const initial = getRandomOriginData();
-    setOriginState(prev => ({ ...prev, ...initial }));
+    setReelItems(generateReel());
   }, []);
 
-  // --- UNIFIED TOUCH/MOUSE HANDLERS ---
-  const minSwipeDistance = 40;
-
-  const handleInputStart = (clientX: number) => {
-    setDragStart(clientX);
-  };
-
-  const handleInputEnd = (clientX: number) => {
-    if (dragStart === null) return;
-    
-    const distance = dragStart - clientX;
-    const absDist = Math.abs(distance);
-    
-    // Check if it's a click (very small movement)
-    if (absDist < 10) {
-        handleOriginClick();
-    } 
-    // Check if it's a swipe
-    else if (absDist > minSwipeDistance) {
-        const isLeftSwipe = distance > 0;
-        
-        if (navigator.vibrate) navigator.vibrate(10);
-        
-        const direction = isLeftSwipe ? 'left' : 'right';
-        setSwipeDirection(direction);
-
-        // Delay data update to match CSS transition duration
-        setTimeout(() => {
-            const newData = getRandomOriginData();
-            setOriginState(prev => ({
-                ...prev,
-                ...newData,
-                isCycling: false,
-                label: `${newData.label} [NEW]` 
-            }));
-            setSwipeDirection(null);
-        }, 300); // 300ms matches CSS duration
-    }
-    
-    setDragStart(null);
-  };
-
-  // Touch Events
-  const onTouchStart = (e: React.TouchEvent) => handleInputStart(e.targetTouches[0].clientX);
-  const onTouchEnd = (e: React.TouchEvent) => handleInputEnd(e.changedTouches[0].clientX);
-
-  // Mouse Events
-  const onMouseDown = (e: React.MouseEvent) => {
-      e.preventDefault(); // Prevent default drag behavior of images
-      handleInputStart(e.clientX);
-  }
-  const onMouseUp = (e: React.MouseEvent) => handleInputEnd(e.clientX);
-  const onMouseLeave = () => setDragStart(null); // Cancel drag if leaving area
-
-  // Handle Image 404s
-  const handleImageError = (fallbackSrc: string) => {
-    // Only update if we aren't already on the fallback to avoid infinite loops
-    if (originState.image !== fallbackSrc) {
-       setOriginState(prev => ({ ...prev, image: fallbackSrc }));
+  const handleReelChange = (index: number) => {
+    if (reelItems[index]) {
+        if (navigator.vibrate) navigator.vibrate(5); // Tiny tick on scroll
+        setCurrentEvidenceLabel(reelItems[index].label);
     }
   };
 
-  // Handle Click Animation ("Slot Machine / Glitch Effect")
-  const handleOriginClick = () => {
-    if (originState.isCycling) return;
-
-    if (navigator.vibrate) navigator.vibrate(50); // Initial haptic feedback
-
-    // Start the cycle
-    setOriginState(prev => ({ ...prev, isCycling: true }));
-
-    let steps = 0;
-    const maxSteps = 12; // Number of "slots" to cycle through
-    const intervalTime = 60; // Speed of cycle in ms
-
-    const interval = setInterval(() => {
-        steps++;
-        const randomData = getRandomOriginData();
-        
-        // Random haptic ticks
-        if (navigator.vibrate && Math.random() > 0.7) navigator.vibrate(10);
-
-        setOriginState({
-            isCycling: true,
-            image: randomData.image,
-            label: `DECRYPTING... ${Math.floor(Math.random() * 99999)}`
-        });
-
-        if (steps >= maxSteps) {
-            clearInterval(interval);
-            // Land on final image
-            const finalData = getRandomOriginData();
-            setOriginState({
-                image: finalData.image,
-                label: finalData.label,
-                isCycling: false
-            });
-            if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
-        }
-    }, intervalTime);
-  };
-  
   const handleEasterEgg = () => {
     if (navigator.vibrate) {
         navigator.vibrate([100, 30, 100, 30, 500, 50, 500]);
@@ -432,52 +334,36 @@ const App: React.FC = () => {
             <RevealOnScroll delay={200} className="relative group select-none">
               {/* Image Border darkened for contrast */}
               <div 
-                className="aspect-square border border-black relative overflow-hidden bg-black rounded-sm shadow-[10px_10px_0px_rgba(0,0,0,0.2)] cursor-pointer group-hover:shadow-[15px_15px_0px_rgba(0,0,0,0.2)] transition-shadow duration-300"
-                onTouchStart={onTouchStart}
-                onTouchEnd={onTouchEnd}
-                onMouseDown={onMouseDown}
-                onMouseUp={onMouseUp}
-                onMouseLeave={onMouseLeave}
+                className="aspect-square border border-black relative bg-black rounded-sm shadow-[10px_10px_0px_rgba(0,0,0,0.2)] group-hover:shadow-[15px_15px_0px_rgba(0,0,0,0.2)] transition-shadow duration-300"
               >
                  {/* 
-                     WRAPPER DIV HANDLES SWIPE TRANSITIONS
-                     This moves the entire "card content" left/right while the frame stays
+                     FILM STRIP REEL CONTAINER 
+                     This ParallaxImage component now handles the vertical scrolling 'reel' effect internally.
                  */}
-                 <div className={`w-full h-full transition-all duration-300 transform ${
-                     swipeDirection === 'left' ? '-translate-x-20 opacity-0 blur-sm' : 
-                     swipeDirection === 'right' ? 'translate-x-20 opacity-0 blur-sm' : 
-                     'translate-x-0 opacity-100 blur-0'
-                 }`}>
-                     {/* New Parallax Component using random image */}
-                     <ParallaxImage 
-                       src={originState.image} 
-                       alt="Studio Interior" 
-                       isActive={originState.isCycling}
-                       className="w-full h-full" 
-                       onError={handleImageError}
-                     />
-                     
-                     {/* CRT Scanline Overlay */}
-                     <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(0,0,0,0.06),rgba(0,0,0,0.02),rgba(0,0,0,0.06))] z-10 bg-[length:100%_2px,3px_100%] pointer-events-none" />
-                     
-                     <div className="absolute top-4 left-4 border border-black text-black px-2 py-1 font-mono text-xs tracking-widest z-20 bg-ufo-accent/80 backdrop-blur-sm">
-                       TOP SECRET
-                     </div>
-                     <div className={`absolute bottom-4 right-4 font-mono text-xs bg-black px-2 py-1 font-bold z-20 transition-colors duration-100 ${originState.isCycling ? 'text-red-500 bg-black' : 'text-ufo-accent'}`}>
-                       {originState.label}
-                     </div>
+                 <ParallaxImage 
+                   items={reelItems}
+                   onIndexChange={handleReelChange}
+                   className="w-full h-full" 
+                 />
+                 
+                 {/* OVERLAYS - FIXED ON TOP OF THE SCROLLING REEL */}
+                 
+                 {/* CRT Scanline Overlay */}
+                 <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(0,0,0,0.06),rgba(0,0,0,0.02),rgba(0,0,0,0.06))] z-10 bg-[length:100%_2px,3px_100%] pointer-events-none" />
+                 
+                 <div className="absolute top-4 left-4 border border-black text-black px-2 py-1 font-mono text-xs tracking-widest z-20 bg-ufo-accent/80 backdrop-blur-sm shadow-md">
+                   TOP SECRET
+                 </div>
+                 
+                 <div className="absolute bottom-4 right-4 font-mono text-xs bg-black px-2 py-1 font-bold z-20 transition-colors duration-100 text-ufo-accent border border-ufo-accent/30 shadow-md">
+                   {currentEvidenceLabel}
+                 </div>
 
-                     {/* Click Hint Overlay (Only on Hover when idle) */}
-                     {!originState.isCycling && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30">
-                           <div className="bg-black/80 text-white font-mono text-xs px-3 py-1 border border-white/20 tracking-widest mb-2">
-                              [ CLICK TO GLITCH ]
-                           </div>
-                           <div className="bg-black/60 text-white/50 font-mono text-[10px] px-2 py-0.5 tracking-widest md:hidden">
-                              [ SWIPE FOR INTEL ]
-                           </div>
-                        </div>
-                     )}
+                 {/* Click Hint Overlay (Only on Hover) */}
+                 <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30">
+                    <div className="bg-black/60 text-white/50 font-mono text-[10px] px-2 py-0.5 tracking-widest uppercase">
+                       [ SCROLL REEL ]
+                    </div>
                  </div>
               </div>
               {/* Decorative corners - Black */}
