@@ -573,9 +573,9 @@ const App: React.FC = () => {
               </p>
             </div>
 
-            <div className="text-left md:text-right w-full md:w-auto">
+            <div className="text-right w-full md:w-auto">
                <div 
-                 className="w-16 h-16 mr-auto md:ml-auto md:mr-0 mb-4 cursor-pointer hover:scale-110 transition-transform duration-300"
+                 className="w-16 h-16 ml-auto mb-4 cursor-pointer hover:scale-110 transition-transform duration-300"
                  onClick={handleEasterEgg}
                >
                   <img 
