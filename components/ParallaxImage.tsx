@@ -5,6 +5,7 @@ interface ParallaxImageProps {
   alt: string;
   className?: string;
   isActive?: boolean; // Prop for external animation trigger
+  videoUrl?: string | null; // New prop for animated video content
   onClick?: () => void;
 }
 
@@ -13,6 +14,7 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({
   alt, 
   className = "", 
   isActive = false,
+  videoUrl = null,
   onClick
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -97,47 +99,69 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({
       className={`overflow-hidden relative bg-black ${className} ${onClick ? 'cursor-pointer' : ''}`}
     >
       
-      {/* GLITCH LAYER: CYAN (Behind) - Only visible during glitch */}
-      <img 
-        src={activeSrc} 
-        onError={handleError}
-        alt=""
-        className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-opacity duration-75 mix-blend-screen opacity-0 ${isGlitching ? 'opacity-70' : ''}`}
-        style={{ 
-          transform: `translateY(${offset}px) translateX(${glitchState.shift + (isActive ? Math.random() * 10 - 5 : 0)}px)`,
-          filter: 'sepia(100%) saturate(300%) hue-rotate(130deg)', // Cyan tint
-          clipPath: isGlitching ? `polygon(0 ${glitchState.sliceTop}%, 100% ${glitchState.sliceTop}%, 100% ${100 - glitchState.sliceBottom}%, 0 ${100 - glitchState.sliceBottom}%)` : 'none'
-        }}
-      />
+      {/* If Video URL exists, render Video, otherwise Images */}
+      {videoUrl ? (
+        <>
+            <video 
+                src={videoUrl}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-opacity duration-1000 ease-in-out relative z-10 animate-flicker-on"
+                style={{ 
+                    transform: `translateY(${offset}px)`,
+                    filter: 'contrast(110%) brightness(1.1)' 
+                }}
+            />
+            {/* Overlay a faint grid to make it look digital */}
+            <div className="absolute inset-0 z-20 pointer-events-none bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.2)_50%)] bg-[length:100%_4px]" />
+        </>
+      ) : (
+          <>
+            {/* GLITCH LAYER: CYAN (Behind) - Only visible during glitch */}
+            <img 
+                src={activeSrc} 
+                onError={handleError}
+                alt=""
+                className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-opacity duration-75 mix-blend-screen opacity-0 ${isGlitching ? 'opacity-70' : ''}`}
+                style={{ 
+                transform: `translateY(${offset}px) translateX(${glitchState.shift + (isActive ? Math.random() * 10 - 5 : 0)}px)`,
+                filter: 'sepia(100%) saturate(300%) hue-rotate(130deg)', // Cyan tint
+                clipPath: isGlitching ? `polygon(0 ${glitchState.sliceTop}%, 100% ${glitchState.sliceTop}%, 100% ${100 - glitchState.sliceBottom}%, 0 ${100 - glitchState.sliceBottom}%)` : 'none'
+                }}
+            />
 
-      {/* GLITCH LAYER: RED (Behind) - Only visible during glitch */}
-      <img 
-        src={activeSrc}
-        onError={handleError}
-        alt=""
-        className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-opacity duration-75 mix-blend-screen opacity-0 ${isGlitching ? 'opacity-70' : ''}`}
-        style={{ 
-          transform: `translateY(${offset}px) translateX(${-(glitchState.shift + (isActive ? Math.random() * 10 - 5 : 0))}px)`,
-          filter: 'sepia(100%) saturate(300%) hue-rotate(-50deg)', // Red tint
-        }}
-      />
+            {/* GLITCH LAYER: RED (Behind) - Only visible during glitch */}
+            <img 
+                src={activeSrc}
+                onError={handleError}
+                alt=""
+                className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-opacity duration-75 mix-blend-screen opacity-0 ${isGlitching ? 'opacity-70' : ''}`}
+                style={{ 
+                transform: `translateY(${offset}px) translateX(${-(glitchState.shift + (isActive ? Math.random() * 10 - 5 : 0))}px)`,
+                filter: 'sepia(100%) saturate(300%) hue-rotate(-50deg)', // Red tint
+                }}
+            />
 
-      {/* MAIN IMAGE */}
-      <img 
-        src={activeSrc}
-        onError={handleError}
-        alt={alt}
-        className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-all duration-100 ease-linear will-change-transform relative z-10`}
-        style={{ 
-          transform: `translateY(${offset}px)`,
-          // If active (cycling), we invert and saturate heavily for a decoding look
-          filter: isActive 
-             ? 'invert(1) contrast(150%) saturate(0)'
-             : isGlitching 
-                ? 'grayscale(0%) contrast(100%) brightness(1.2)' 
-                : 'grayscale(100%) contrast(125%) brightness(0.9)'
-        }}
-      />
+            {/* MAIN IMAGE */}
+            <img 
+                src={activeSrc}
+                onError={handleError}
+                alt={alt}
+                className={`w-full h-[120%] object-cover absolute -top-[10%] left-0 transition-all duration-100 ease-linear will-change-transform relative z-10`}
+                style={{ 
+                transform: `translateY(${offset}px)`,
+                // If active (cycling), we invert and saturate heavily for a decoding look
+                filter: isActive 
+                    ? 'invert(1) contrast(150%) saturate(0)'
+                    : isGlitching 
+                        ? 'grayscale(0%) contrast(100%) brightness(1.2)' 
+                        : 'grayscale(100%) contrast(125%) brightness(0.9)'
+                }}
+            />
+          </>
+      )}
 
       {/* NOISE OVERLAY (Always on top) */}
       <div className="absolute inset-0 bg-ufo-accent/10 mix-blend-overlay pointer-events-none z-20" />
