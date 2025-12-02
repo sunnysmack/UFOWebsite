@@ -2,7 +2,7 @@ import React from 'react';
 import RevealOnScroll from './RevealOnScroll';
 import ScrambleText from './ScrambleText';
 
-// Mock Data - Replace links with actual Spotify/Apple Music URLs
+// Mock Data - Add your image paths to the 'cover' property
 const ALBUMS = [
   {
     title: "FREQUENCY_ZERO",
@@ -11,7 +11,8 @@ const ALBUMS = [
     duration: "42:15",
     color: "from-purple-900 to-blue-900",
     tracks: ["Static Dawn", "Neon Veins", "Zero Point"],
-    link: "https://open.spotify.com/artist/sunnysmack" 
+    link: "https://open.spotify.com/artist/sunnysmack",
+    cover: "" // e.g., "/images/frequency_zero.jpg"
   },
   {
     title: "ANALOG_GHOSTS",
@@ -20,7 +21,8 @@ const ALBUMS = [
     duration: "18:30",
     color: "from-red-900 to-orange-900",
     tracks: ["Haunt", "Poltergeist", "Exorcism_V2"],
-    link: "https://open.spotify.com/artist/sunnysmack"
+    link: "https://open.spotify.com/artist/sunnysmack",
+    cover: ""
   },
   {
     title: "VOID_RUNNER",
@@ -29,7 +31,8 @@ const ALBUMS = [
     duration: "04:20",
     color: "from-emerald-900 to-teal-900",
     tracks: ["Void Runner (Original Mix)"],
-    link: "https://open.spotify.com/artist/sunnysmack"
+    link: "https://open.spotify.com/artist/sunnysmack",
+    cover: ""
   },
   {
     title: "SYSTEM_CRASH_V1",
@@ -38,7 +41,8 @@ const ALBUMS = [
     duration: "22:10",
     color: "from-rose-900 to-pink-900",
     tracks: ["Kernel Panic", "Fatal Exception", "Force Quit"],
-    link: "https://open.spotify.com/artist/sunnysmack"
+    link: "https://open.spotify.com/artist/sunnysmack",
+    cover: ""
   },
   {
     title: "DEEP_WEB_DIVING",
@@ -47,7 +51,8 @@ const ALBUMS = [
     duration: "38:45",
     color: "from-cyan-900 to-blue-900",
     tracks: ["Onion Router", "Encrypted Walls", "Bitcoin Assassin"],
-    link: "https://open.spotify.com/artist/sunnysmack"
+    link: "https://open.spotify.com/artist/sunnysmack",
+    cover: ""
   },
   {
     title: "SIGNAL_LOSS",
@@ -56,7 +61,8 @@ const ALBUMS = [
     duration: "03:33",
     color: "from-gray-800 to-gray-900",
     tracks: ["White Noise", "Static (Reprise)"],
-    link: "https://open.spotify.com/artist/sunnysmack"
+    link: "https://open.spotify.com/artist/sunnysmack",
+    cover: ""
   }
 ];
 
@@ -103,49 +109,59 @@ const SunnysmackAudio: React.FC = () => {
            {ALBUMS.map((album, idx) => (
              <div 
                 key={idx} 
-                className="snap-center shrink-0 w-[85vw] md:w-[400px] relative group perspective-1000"
+                className="snap-center shrink-0 w-[85vw] md:w-[350px] relative group perspective-1000"
              >
                 {/* Card Container */}
                 <div className="relative bg-[#111] border border-ufo-gray group-hover:border-ufo-accent transition-all duration-500 overflow-hidden rounded-sm hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(255,215,0,0.1)]">
                    
-                   {/* Album Art Visualization (CSS Generated Tape) */}
-                   <div className={`h-64 bg-gradient-to-br ${album.color} relative overflow-hidden p-6 flex flex-col justify-between`}>
-                      {/* Noise Texture */}
-                      <div className="absolute inset-0 opacity-30 bg-noise mix-blend-overlay" />
-                      
-                      {/* Tape Reels UI */}
-                      <div className="relative z-10 bg-black/30 backdrop-blur-md border border-white/10 p-4 rounded-sm flex items-center justify-between">
-                         <div className="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center animate-[spin_4s_linear_infinite]">
-                            <div className="w-8 h-8 rounded-full border border-dashed border-white/40" />
-                         </div>
-                         <div className="h-8 flex-1 mx-4 bg-black/50 rounded-sm overflow-hidden flex items-center px-2">
-                            <div className="w-full h-1 bg-white/20" />
-                         </div>
-                         <div className="w-12 h-12 rounded-full border-2 border-white/20 flex items-center justify-center animate-[spin_4s_linear_infinite]">
-                            <div className="w-8 h-8 rounded-full border border-dashed border-white/40" />
-                         </div>
-                      </div>
+                   {/* Album Art Container - SQUARE (Aspect Ratio 1:1) */}
+                   <div className="aspect-square w-full relative overflow-hidden bg-black">
+                      {album.cover ? (
+                         <img 
+                           src={album.cover} 
+                           alt={album.title} 
+                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                         />
+                      ) : (
+                         /* Fallback CSS Tape Art - Centered in Square */
+                         <div className={`w-full h-full bg-gradient-to-br ${album.color} relative p-6 flex flex-col justify-center items-center`}>
+                            {/* Noise Texture */}
+                            <div className="absolute inset-0 opacity-30 bg-noise mix-blend-overlay" />
+                            
+                            {/* Tape Reels UI */}
+                            <div className="relative z-10 bg-black/30 backdrop-blur-md border border-white/10 p-4 rounded-sm flex items-center justify-between w-full max-w-[90%] shadow-lg">
+                               <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-white/20 flex items-center justify-center animate-[spin_4s_linear_infinite]">
+                                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-dashed border-white/40" />
+                               </div>
+                               <div className="h-6 md:h-8 flex-1 mx-4 bg-black/50 rounded-sm overflow-hidden flex items-center px-2">
+                                  <div className="w-full h-1 bg-white/20" />
+                               </div>
+                               <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-white/20 flex items-center justify-center animate-[spin_4s_linear_infinite]">
+                                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-dashed border-white/40" />
+                               </div>
+                            </div>
 
-                      <div className="relative z-10">
-                        <span className="font-mono text-xs border border-white/30 px-2 py-1 rounded text-white/80">{album.type}</span>
-                      </div>
+                            <div className="relative z-10 mt-6">
+                              <span className="font-mono text-xs border border-white/30 px-3 py-1 rounded text-white/80">{album.type}</span>
+                            </div>
+                         </div>
+                      )}
+                      
+                      {/* Overlay Play Button (Visible on Hover) */}
+                      <a href={album.link} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20 cursor-pointer">
+                          <div className="w-16 h-16 rounded-full border border-ufo-accent bg-black/50 backdrop-blur flex items-center justify-center transform scale-50 group-hover:scale-100 transition-transform duration-300">
+                               <div className="ml-1 border-y-[8px] border-y-transparent border-l-[16px] border-l-ufo-accent" />
+                          </div>
+                      </a>
                    </div>
 
                    {/* Info Section */}
                    <div className="p-6">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="font-sans text-2xl font-bold text-white group-hover:text-ufo-accent transition-colors">{album.title}</h3>
+                          <h3 className="font-sans text-xl md:text-2xl font-bold text-white group-hover:text-ufo-accent transition-colors truncate w-[200px] md:w-auto">{album.title}</h3>
                           <p className="font-mono text-xs text-gray-500 mt-1">{album.year} • {album.duration}</p>
                         </div>
-                        <a 
-                          href={album.link} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="w-10 h-10 rounded-full border border-ufo-gray flex items-center justify-center hover:bg-ufo-accent hover:text-black transition-all"
-                        >
-                          ▶
-                        </a>
                       </div>
 
                       {/* Tracklist Preview */}
@@ -157,9 +173,14 @@ const SunnysmackAudio: React.FC = () => {
                         ))}
                       </div>
 
-                      <button className="w-full py-3 border border-ufo-accent/30 text-ufo-accent font-mono text-xs uppercase hover:bg-ufo-accent hover:text-black transition-colors">
+                      <a 
+                        href={album.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block w-full text-center py-3 border border-ufo-accent/30 text-ufo-accent font-mono text-xs uppercase hover:bg-ufo-accent hover:text-black transition-colors"
+                      >
                         Stream Transmission
-                      </button>
+                      </a>
                    </div>
                 </div>
              </div>
