@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 
-const TvStaticBackground: React.FC = () => {
+interface TvStaticProps {
+  className?: string;
+}
+
+const TvStaticBackground: React.FC<TvStaticProps> = ({ className }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -13,8 +17,15 @@ const TvStaticBackground: React.FC = () => {
     let animationFrameId: number;
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      // Use parent dimensions if available, else fallback to window
+      const parent = canvas.parentElement;
+      if (parent) {
+        canvas.width = parent.clientWidth;
+        canvas.height = parent.clientHeight;
+      } else {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
     };
 
     const draw = () => {
@@ -39,10 +50,9 @@ const TvStaticBackground: React.FC = () => {
         ctx.fillRect(0, i, w, 2);
       }
       
-      // 1. Center Glow (Brighter static near logo)
-      // We draw a white radial gradient with 'screen' blend mode to boost brightness in center
+      // 1. Center Glow (Brighter static near logo/center)
       const centerGlow = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, h / 2);
-      centerGlow.addColorStop(0, 'rgba(255, 255, 255, 0.15)'); // Subtle white glow at center
+      centerGlow.addColorStop(0, 'rgba(255, 255, 255, 0.15)'); 
       centerGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
       
       ctx.globalCompositeOperation = 'screen';
@@ -71,10 +81,13 @@ const TvStaticBackground: React.FC = () => {
     };
   }, []);
 
+  const defaultStyles = "opacity-30 mix-blend-screen";
+  const finalClassName = `absolute inset-0 w-full h-full pointer-events-none z-0 ${className || defaultStyles}`;
+
   return (
     <canvas 
       ref={canvasRef} 
-      className="absolute inset-0 w-full h-full opacity-30 pointer-events-none mix-blend-screen z-0"
+      className={finalClassName}
     />
   );
 };
