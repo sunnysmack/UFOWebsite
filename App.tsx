@@ -12,7 +12,6 @@ import Timetruck from './components/Timetruck';
 import SunnysmackAudio from './components/SunnysmackAudio';
 import CrackedScreenOverlay from './components/CrackedScreenOverlay';
 import { NavItem } from './types';
-import { animateImage } from './services/geminiService';
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'CLASSIFIED', href: '#origin' },
@@ -79,10 +78,8 @@ const App: React.FC = () => {
   // Easter Egg State
   const [isCracked, setIsCracked] = useState(false);
   
-  // Fullscreen Image & Animation State
+  // Fullscreen Image State
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [animatedVideoUrl, setAnimatedVideoUrl] = useState<string | null>(null);
 
   // Ref and state for the lighting transition on the Origin section
   const originRef = useRef<HTMLDivElement>(null);
@@ -130,40 +127,8 @@ const App: React.FC = () => {
     setIsCracked(true);
   };
 
-  // Helper to convert URL to Base64 for the API
-  const getBase64FromUrl = async (url: string): Promise<string> => {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  };
-
-  const handleAnimate = async () => {
-    if (!fullscreenImage || isAnimating) return;
-    
-    setIsAnimating(true);
-    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-
-    try {
-      const base64 = await getBase64FromUrl(fullscreenImage);
-      const videoUrl = await animateImage(base64);
-      setAnimatedVideoUrl(videoUrl);
-    } catch (error) {
-      console.error("Animation failed:", error);
-      alert("SIGNAL INTERFERENCE. ANIMATION FAILED.");
-    } finally {
-      setIsAnimating(false);
-    }
-  };
-
   const closeFullscreen = () => {
     setFullscreenImage(null);
-    setAnimatedVideoUrl(null);
-    setIsAnimating(false);
   };
 
   useEffect(() => {
@@ -201,40 +166,22 @@ const App: React.FC = () => {
       {loading && <Preloader onComplete={() => setLoading(false)} />}
       {isCracked && <CrackedScreenOverlay onComplete={() => setIsCracked(false)} />}
       
-      {/* Fullscreen Image/Animation Modal */}
+      {/* Fullscreen Image Modal */}
       {fullscreenImage && (
         <div 
           className="fixed inset-0 z-[100] bg-black/98 flex flex-col items-center justify-center p-4 animate-in fade-in duration-300"
           onClick={closeFullscreen}
         >
-           {/* Image/Video Container - Warm White Glow added here */}
+           {/* Image Container - Warm White Glow added here */}
            <div 
              className="relative max-w-full max-h-[70vh] shadow-[0_0_100px_rgba(255,220,180,0.4)] rounded-sm transition-all duration-500" 
              onClick={(e) => e.stopPropagation()}
            >
-              {animatedVideoUrl ? (
-                <video 
-                  src={animatedVideoUrl} 
-                  autoPlay 
-                  loop 
-                  className="max-h-[70vh] max-w-[90vw] object-contain rounded-sm"
+                <img 
+                  src={fullscreenImage} 
+                  alt="Evidence" 
+                  className="max-h-[70vh] max-w-[90vw] object-contain rounded-sm" 
                 />
-              ) : (
-                <div className="relative">
-                  <img 
-                    src={fullscreenImage} 
-                    alt="Evidence" 
-                    className={`max-h-[70vh] max-w-[90vw] object-contain rounded-sm transition-opacity duration-500 ${isAnimating ? 'opacity-50 blur-sm' : 'opacity-100'}`} 
-                  />
-                  {/* Loading Spinner */}
-                  {isAnimating && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                        <div className="w-12 h-12 border-2 border-ufo-accent border-t-transparent rounded-full animate-spin" />
-                        <span className="font-mono text-ufo-accent text-xs tracking-widest blink">GENERATING...</span>
-                    </div>
-                  )}
-                </div>
-              )}
            </div>
 
            {/* Controls Row - Below Image */}
@@ -245,21 +192,6 @@ const App: React.FC = () => {
               >
                 [ Close ]
               </button>
-              
-              {!animatedVideoUrl && (
-                <button 
-                  onClick={handleAnimate}
-                  disabled={isAnimating}
-                  className={`px-6 py-3 font-mono text-sm tracking-widest transition-all uppercase flex items-center gap-2
-                    ${isAnimating 
-                      ? 'bg-ufo-gray text-gray-500 cursor-not-allowed border border-transparent' 
-                      : 'bg-ufo-accent text-black hover:bg-white border border-ufo-accent shadow-[0_0_20px_rgba(255,215,0,0.3)]'
-                    }`}
-                >
-                  {isAnimating ? 'Processing...' : 'Animate'}
-                  {!isAnimating && <span className="text-[10px]">▶</span>}
-                </button>
-              )}
            </div>
         </div>
       )}
@@ -429,128 +361,4 @@ const App: React.FC = () => {
                </div>
                
                <div className="h-1 w-24 bg-black mb-8" />
-               <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-bold">
-                 Established in the bedroom of 13 year old Jason Eddie Nowak during the summer of 1987, UFO Studios is a shadowy 
-                 "non-government" contractor, specializing in narrative control and mass communication. 
-                Basically, we tell stories.  Possibly your story. Let's Make Stuff. 
-               </p>
-            </RevealOnScroll>
-            
-            <RevealOnScroll delay={200} className="relative group select-none">
-              {/* Image Border darkened for contrast */}
-              <div 
-                className="aspect-square border border-black relative bg-black rounded-sm shadow-[10px_10px_0px_rgba(0,0,0,0.2)] group-hover:shadow-[15px_15px_0px_rgba(0,0,0,0.2)] transition-shadow duration-300"
-              >
-                 {/* 
-                     FILM STRIP REEL CONTAINER 
-                     This ParallaxImage component now handles the vertical scrolling 'reel' effect internally.
-                 */}
-                 <ParallaxImage 
-                   items={reelItems}
-                   onIndexChange={handleReelChange}
-                   onImageClick={setFullscreenImage}
-                   className="w-full h-full" 
-                 />
-                 
-                 {/* OVERLAYS - FIXED ON TOP OF THE SCROLLING REEL */}
-                 
-                 {/* CRT Scanline Overlay */}
-                 <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(0,0,0,0.06),rgba(0,0,0,0.02),rgba(0,0,0,0.06))] z-10 bg-[length:100%_2px,3px_100%] pointer-events-none" />
-                 
-                 <div className="absolute top-4 left-4 border border-black text-black px-2 py-1 font-mono text-xs tracking-widest z-20 bg-ufo-accent/80 backdrop-blur-sm shadow-md">
-                   TOP SECRET
-                 </div>
-                 
-                 <div className="absolute bottom-4 right-4 font-mono text-xs bg-black px-2 py-1 font-bold z-20 transition-colors duration-100 text-ufo-accent border border-ufo-accent/30 shadow-md">
-                   {currentEvidenceLabel}
-                 </div>
-              </div>
-              {/* Decorative corners - Black */}
-              <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-black" />
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-black" />
-            </RevealOnScroll>
-          </div>
-        </section>
-
-        {/* SERVICES */}
-        <section id="services" className="py-24 px-6 bg-[#080808] relative border-t border-ufo-gray/30">
-          <div className="container mx-auto">
-            <RevealOnScroll className="mb-16 flex items-end justify-between border-b border-ufo-gray/50 pb-8">
-              <ScrambleText text="PROTOCOL" as="h2" className="font-sans text-4xl md:text-6xl font-bold" />
-              <span className="font-mono text-ufo-accent hidden md:block">CLEARANCE: LEVEL 4</span>
-            </RevealOnScroll>
-
-            <div className="grid md:grid-cols-3 gap-8">
-               {[
-                 { title: 'PROPAGANDA', desc: 'Social engineering and viral deployment. We will paint your picture.  We will deliver your message.', num: '01' },
-                 { title: 'COUNTER INTEL', desc: 'Visual design that confuses, captivates, and commands attention.  Your enemies immediately become ours.', num: '02' },
-                 { title: 'HISTORY REVISION', desc: 'Brand narrative construction. We have been in this business since the 20th century.  No lie.', num: '03' }
-               ].map((service, idx) => (
-                 <ServiceItem key={idx} service={service} index={idx} />
-               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* TIMETRUCK SECTION */}
-        <Timetruck />
-        
-        {/* AUDIO / SUNNYSMACK SECTION (NEW) */}
-        <SunnysmackAudio />
-
-        {/* SECTOR SCAN (VISUAL THREAT ASSESSMENT) */}
-        <section id="intelligence" className="py-24 px-6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-ufo-accent/5" />
-          <div className="container mx-auto max-w-4xl relative z-10">
-            <RevealOnScroll className="text-center mb-12">
-              <ScrambleText text="SECTOR SCAN" as="h2" className="font-sans text-4xl md:text-5xl font-bold mb-4" />
-              <p className="font-mono text-sm text-gray-400">UPLOAD VISUAL TELEMETRY. IDENTIFY HIDDEN THREATS.</p>
-            </RevealOnScroll>
-
-            <VisualThreatAssessment />
-            
-          </div>
-        </section>
-
-        {/* FOOTER */}
-        <footer id="contact" className="bg-black py-20 px-6 border-t border-ufo-gray/30">
-          <div className="container mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
-            <div>
-              <h2 className="font-sans text-3xl font-bold mb-6">SECURE CHANNEL</h2>
-              <a href="mailto:jasoneddie@gmail.com" className="font-mono text-xl hover:text-ufo-accent underline decoration-ufo-accent underline-offset-4 transition-colors">
-                jasoneddie@gmail.com
-              </a>
-              <p className="font-mono text-sm text-gray-500 mt-4">
-                FIELD OFFICE:<br/>
-                MILWAUKEE, WI<br/>
-                UNITED STATES<br/>
-                43.0389° N, 87.9065° W
-              </p>
-            </div>
-
-            <div className="text-right w-full md:w-auto">
-               <div 
-                 className="w-16 h-16 ml-auto mb-4 cursor-pointer hover:scale-110 transition-transform duration-300"
-                 onClick={handleEasterEgg}
-               >
-                  {/* REVERTED TO IMAGE AS REQUESTED */}
-                  <img 
-                    src="/images/logo.png" 
-                    alt="UFO Studios" 
-                    className="w-full h-full object-contain opacity-50 hover:opacity-100 transition-opacity" 
-                  />
-               </div>
-               <p className="font-mono text-xs text-gray-600">
-                 © 1987 - {new Date().getFullYear()} UFO STUDIOS CORP.<br/>
-                 GOVERNMENT CONTRACTOR 87-X.<br/>
-                 Please Be Prepared.
-               </p>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </>
-  );
-};
-
-export default App;
+               <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-
