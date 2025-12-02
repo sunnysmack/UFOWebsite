@@ -12,7 +12,7 @@ const ALBUMS = [
     color: "from-purple-900 to-blue-900",
     tracks: ["Escalators", "Meet the Band"],
     link: "https://open.spotify.com/artist/sunnysmack",
-    cover: "/images/album6.jpg" // e.g., "/images/frequency_zero.jpg"
+    cover: "/images/album6.jpg"
   },
   {
     title: "I Don't Mind Myself, Sometimes.",
@@ -91,8 +91,11 @@ const SunnysmackAudio: React.FC = () => {
                </div>
                <span className="font-mono text-xs text-ufo-accent tracking-widest">AUDIO_LINK_ESTABLISHED</span>
             </div>
-            <ScrambleText text="SUNNYSMACK" as="h2" className="font-sans text-5xl md:text-7xl font-bold text-white tracking-tighter" />
-            <p className="font-mono text-gray-500 mt-2">SONIC WARFARE / AUDIO ARCHIVE</p>
+            {/* Reduced size to prevent mobile cutoff (text-3xl/4xl on mobile, 7xl on desktop) */}
+            <ScrambleText text="SUNNYSMACK" as="h2" className="font-sans text-3xl sm:text-4xl md:text-7xl font-bold text-white tracking-tighter" />
+            
+            {/* Reduced size for subtitle (text-xs on mobile) */}
+            <p className="font-mono text-xs md:text-base text-gray-500 mt-2">SONIC WARFARE / AUDIO ARCHIVE</p>
           </div>
           
           <div className="hidden md:block font-mono text-right text-xs text-gray-400">
