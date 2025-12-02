@@ -19,7 +19,6 @@ const Preloader: React.FC<PreloaderProps> = ({ onComplete, images = [] }) => {
   const [lines, setLines] = useState<string[]>([]);
   const [isExiting, setIsExiting] = useState(false);
   const [textSequenceDone, setTextSequenceDone] = useState(false);
-  const [assetsLoaded, setAssetsLoaded] = useState(false);
   
   // Ref ensures we don't send duplicate notifications if re-renders happen
   const notificationSentRef = useRef(false);
@@ -32,36 +31,14 @@ const Preloader: React.FC<PreloaderProps> = ({ onComplete, images = [] }) => {
     userAgent: navigator.userAgent
   });
 
-  // --- ASSET PRELOADING LOGIC ---
+  // --- PRELOAD IMAGES ---
   useEffect(() => {
-    if (!images || images.length === 0) {
-      setAssetsLoaded(true);
-      return;
+    if (images && images.length > 0) {
+      images.forEach((src) => {
+        const img = new Image();
+        img.src = src;
+      });
     }
-
-    let loadedCount = 0;
-    const total = images.length;
-    let isMounted = true;
-
-    const handleItemLoad = () => {
-      if (!isMounted) return;
-      loadedCount++;
-      if (loadedCount >= total) {
-        setAssetsLoaded(true);
-      }
-    };
-
-    // Deduplicate images
-    const uniqueImages = [...new Set(images)];
-
-    uniqueImages.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-      img.onload = handleItemLoad;
-      img.onerror = handleItemLoad; // Proceed even if asset is missing to avoid hanging
-    });
-
-    return () => { isMounted = false; };
   }, [images]);
 
   // --- NOTIFICATION LOGIC ---
@@ -158,20 +135,13 @@ const Preloader: React.FC<PreloaderProps> = ({ onComplete, images = [] }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // Show "Downloading" message if text is done but images are still loading
+  // COMPLETE when text sequence is ready
   useEffect(() => {
-    if (textSequenceDone && !assetsLoaded) {
-      setLines(prev => [...prev, "DOWNLOADING ART FILES..."]);
-    }
-  }, [textSequenceDone, assetsLoaded]);
-
-  // COMPLETE when BOTH text sequence and assets are ready
-  useEffect(() => {
-    if (textSequenceDone && assetsLoaded && !isExiting) {
+    if (textSequenceDone && !isExiting) {
       setIsExiting(true);
       setTimeout(onComplete, 800);
     }
-  }, [textSequenceDone, assetsLoaded, isExiting, onComplete]);
+  }, [textSequenceDone, isExiting, onComplete]);
 
   if (isExiting && lines.length === 0) return null;
 
