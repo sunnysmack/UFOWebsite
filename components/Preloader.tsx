@@ -1,24 +1,61 @@
-import React, { useEffect, useState } from 'react';
-
-const BOOT_SEQUENCE = [
-  "INITIALIZING BIOS...",
-  "CHECKING MEMORY... 64KB OK",
-  "LOADING KERNEL... OK",
-  "MOUNTING FILE SYSTEM...",
-  "ESTABLISHING SECURE CONNECTION...",
-  "DECRYPTING ASSETS...",
-  "SYSTEM READY."
-];
+import React, { useEffect, useState, useRef } from 'react';
 
 const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [lines, setLines] = useState<string[]>([]);
   const [isExiting, setIsExiting] = useState(false);
+  
+  // Use a ref to store data so we can access updated values inside the interval closure
+  // without triggering re-renders or dependency issues
+  const userDataRef = useRef({
+    city: 'UNKNOWN SECTOR',
+    country: 'UNKNOWN REGION',
+    device: 'UNIDENTIFIED TERMINAL',
+    ip: '::1'
+  });
 
   useEffect(() => {
+    // 1. Hardware Detection (User Agent)
+    const ua = navigator.userAgent;
+    if (ua.match(/Android/i)) userDataRef.current.device = "ANDROID HANDSET";
+    else if (ua.match(/iPhone/i)) userDataRef.current.device = "IPHONE SECURE UNIT";
+    else if (ua.match(/iPad/i)) userDataRef.current.device = "IPAD TABLET";
+    else if (ua.match(/Mac/i)) userDataRef.current.device = "MACINTOSH WORKSTATION";
+    else if (ua.match(/Win/i)) userDataRef.current.device = "WINDOWS TERMINAL";
+    else if (ua.match(/Linux/i)) userDataRef.current.device = "LINUX NODE";
+    
+    // 2. Network Trace (IP Geolocation)
+    // Using a free IP API to get location data. 
+    // If this fails (e.g. adblockers), it gracefully falls back to defaults.
+    fetch('https://ipapi.co/json/')
+      .then(res => res.json())
+      .then(data => {
+        if (data.city) userDataRef.current.city = data.city.toUpperCase();
+        if (data.country_name) userDataRef.current.country = data.country_name.toUpperCase();
+        if (data.ip) userDataRef.current.ip = data.ip;
+      })
+      .catch(err => {
+        console.log("Trace blocked by firewall", err);
+      });
+
+    // 3. Boot Sequence Definition
+    // We use functions here so they evaluate the ref at the moment they are called
+    const sequence = [
+      () => "INITIALIZING BIOS...",
+      () => "CHECKING MEMORY... 64KB OK",
+      () => "CONNECTION... OK",
+      () => "ENTERING UFO: SECURE...",
+      () => `DETECTING HARDWARE... ${userDataRef.current.device}`,
+      () => "ESTABLISHING CONNECTION...",
+      () => "TRACING SIGNAL SOURCE...",
+      () => `TARGET IDENTIFIED: ${userDataRef.current.city}, ${userDataRef.current.country}`,
+      () => "ACCRESS GRANTED...",
+      () => "SYSTEM READY."
+    ];
+
     let currentIndex = 0;
 
     const interval = setInterval(() => {
-      if (currentIndex >= BOOT_SEQUENCE.length) {
+      if (currentIndex >= sequence.length) {
         clearInterval(interval);
         setTimeout(() => {
             setIsExiting(true);
@@ -27,9 +64,10 @@ const Preloader: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
         return;
       }
 
-      setLines(prev => [...prev, BOOT_SEQUENCE[currentIndex]]);
+      const getLineContent = sequence[currentIndex];
+      setLines(prev => [...prev, getLineContent()]);
       currentIndex++;
-    }, 300); // Speed of new lines
+    }, 400); // Speed of text (ms)
 
     return () => clearInterval(interval);
   }, [onComplete]);
