@@ -10,6 +10,7 @@ interface ParallaxImageProps {
 // Sub-component for individual image with glitch logic
 const GlitchImage: React.FC<{ src: string; alt: string; isActive: boolean }> = ({ src, alt, isActive }) => {
   const [glitchStyle, setGlitchStyle] = useState<React.CSSProperties>({});
+  const [clipPath, setClipPath] = useState('');
 
   // Fallback if image fails
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
@@ -17,58 +18,90 @@ const GlitchImage: React.FC<{ src: string; alt: string; isActive: boolean }> = (
   };
 
   useEffect(() => {
-    // Only glitch active item occasionally
+    // Only glitch active item occasionally, but more frequently than before
     if (!isActive) {
         setGlitchStyle({});
+        setClipPath('');
         return;
     }
 
     const triggerGlitch = () => {
-        // Random glitch properties
-        const offset = (Math.random() - 0.5) * 10;
-        const scale = 1 + Math.random() * 0.05;
-        const filter = Math.random() > 0.7 
-            ? `invert(1) hue-rotate(${Math.random() * 90}deg)` 
-            : `contrast(150%) brightness(120%)`;
+        // More aggressive random glitch properties
+        const offsetX = (Math.random() - 0.5) * 30; // Increased range
+        const offsetY = (Math.random() - 0.5) * 30; 
+        const scale = 1 + Math.random() * 0.15; // More zoom jitter
+        const rotate = (Math.random() - 0.5) * 5;
+
+        // More frequent filter changes
+        const filter = Math.random() > 0.6 
+            ? `invert(${Math.random()}) hue-rotate(${Math.random() * 180}deg) contrast(200%)` 
+            : `contrast(180%) brightness(130%) sepia(50%)`;
         
+        // Random Slice effect
+        if (Math.random() > 0.7) {
+            const t1 = Math.floor(Math.random() * 40);
+            const t2 = Math.floor(Math.random() * 40) + 50;
+            setClipPath(`polygon(0 ${t1}%, 100% ${t1}%, 100% ${t2}%, 0 ${t2}%)`);
+        } else {
+            setClipPath('');
+        }
+
         setGlitchStyle({
-            transform: `translate(${offset}px, ${offset}px) scale(${scale})`,
-            filter: filter
+            transform: `translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotate}deg)`,
+            filter: filter,
+            opacity: Math.random() > 0.8 ? 0.5 : 1
         });
 
         // Reset quickly
-        setTimeout(() => setGlitchStyle({}), 100);
+        setTimeout(() => {
+            setGlitchStyle({});
+            setClipPath('');
+        }, 100 + Math.random() * 100);
     };
 
-    // Random interval for glitches
+    // Random interval for glitches - faster loop
     const interval = setInterval(() => {
-        if (Math.random() > 0.8) { // 20% chance to glitch per cycle
+        if (Math.random() > 0.6) { // 40% chance to glitch per cycle (up from 20%)
             triggerGlitch();
         }
-    }, 1000);
+    }, 600); // Check every 600ms
 
     return () => clearInterval(interval);
   }, [isActive]);
 
   return (
-      <img 
-        src={src} 
-        onError={handleError}
-        alt={alt}
-        className="w-full h-full object-cover transition-transform duration-500 ease-out"
-        style={{ 
-            ...glitchStyle,
-            // Base styles
-            transition: 'transform 0.5s ease-out, filter 0.1s steps(2)',
-            // If not glitching, use smooth zoom/focus
-            ...(Object.keys(glitchStyle).length === 0 ? {
-                transform: isActive ? 'scale(1)' : 'scale(0.9)',
-                opacity: isActive ? 1 : 0.5,
-                filter: isActive ? 'grayscale(100%) contrast(110%)' : 'grayscale(100%) contrast(150%) blur(2px)'
-            } : {})
-        }}
-        loading="lazy"
-      />
+      <div className="w-full h-full relative overflow-hidden">
+        {/* Background 'Ghost' Image for extra glitch depth */}
+        {Object.keys(glitchStyle).length > 0 && (
+             <img 
+                src={src}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-screen"
+                style={{ 
+                    transform: 'scale(1.1) translateX(-10px)',
+                    filter: 'hue-rotate(90deg)' 
+                }}
+             />
+        )}
+        
+        <img 
+            src={src} 
+            onError={handleError}
+            alt={alt}
+            className="w-full h-full object-cover transition-transform duration-500 ease-out will-change-transform"
+            style={{ 
+                ...glitchStyle,
+                clipPath: clipPath || 'none',
+                // Base styles if not glitching
+                ...(Object.keys(glitchStyle).length === 0 ? {
+                    transform: isActive ? 'scale(1)' : 'scale(0.9)',
+                    opacity: isActive ? 1 : 0.5,
+                    filter: isActive ? 'grayscale(100%) contrast(110%)' : 'grayscale(100%) contrast(150%) blur(2px)'
+                } : {})
+            }}
+            loading="lazy"
+        />
+      </div>
   );
 };
 
@@ -124,12 +157,19 @@ const ParallaxImage: React.FC<ParallaxImageProps> = ({
           <div 
             key={idx} 
             onClick={() => onImageClick?.(item.image)}
-            className="w-full h-full snap-center shrink-0 relative flex items-center justify-center bg-black overflow-hidden cursor-zoom-in"
+            className="w-full h-full snap-center shrink-0 relative flex items-center justify-center bg-black overflow-hidden cursor-zoom-in group"
           >
              <GlitchImage src={item.image} alt={`Evidence ${idx}`} isActive={activeIndex === idx} />
              
              {/* Vignette per frame */}
              <div className="absolute inset-0 bg-[radial-gradient(circle,transparent_60%,#000_100%)] pointer-events-none" />
+             
+             {/* Hover Hint */}
+             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30">
+                  <div className="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                      <span className="text-white text-xl">+</span>
+                  </div>
+             </div>
           </div>
         ))}
       </div>
