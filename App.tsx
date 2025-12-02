@@ -79,7 +79,7 @@ const App: React.FC = () => {
           <div className="container mx-auto px-6 flex justify-between items-center">
             {/* Header Text - Just "UFO" in new font */}
             <a href="#" className="font-logo text-3xl tracking-tighter hover:text-ufo-accent transition-colors">
-              OUR UFO
+              THE UFO
             </a>
 
             {/* Desktop Nav */}
@@ -191,7 +191,7 @@ const App: React.FC = () => {
                
                <div className="h-1 w-24 bg-black mb-8" />
                <p className="font-mono text-lg text-black/80 leading-relaxed max-w-lg border-l-2 border-black pl-6 font-bold">
-                 Established in 1987 by 13 year old Jason Eddie Nowak, UFO Studios is a shadowy 
+                 Established the of summer 1987 in the bedroom of 13 year old Jason Eddie Nowak, UFO Studios is a shadowy 
                  "non-government" contractor, specializing in narrative control and mass communication. 
                 Basically, we tell stories.  Possibly your story. Let's Make Up...Immediatley.  
                </p>
