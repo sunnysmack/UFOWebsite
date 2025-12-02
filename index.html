@@ -4,10 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UFO Studios | Since 1987</title>
+    <link rel="icon" type="image/png" href="/logo.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="icon" type="image/png" href="/logo.png" />
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
@@ -16,7 +16,7 @@
             colors: {
               'ufo-black': '#050505',
               'ufo-offwhite': '#e0e0e0',
-              'ufo-accent': '#39ff14', // Changed to Lime Green
+              'ufo-accent': '#FFD700', // Changed to Gold
               'ufo-gray': '#1a1a1a'
             },
             fontFamily: {
@@ -62,13 +62,13 @@
       }
       .glitch-text::before {
         left: 2px;
-        text-shadow: -1px 0 #39ff14; /* Green shadow */
+        text-shadow: -1px 0 #FFD700; /* Gold shadow */
         clip-path: inset(24% 0 29% 0);
         animation: glitch-anim 2.5s infinite linear alternate-reverse;
       }
       .glitch-text::after {
         left: -2px;
-        text-shadow: -1px 0 #00aa00; /* Darker Green shadow */
+        text-shadow: -1px 0 #B8860B; /* Darker Gold shadow */
         clip-path: inset(54% 0 21% 0);
         animation: glitch-anim2 2s infinite linear alternate-reverse;
       }
@@ -125,7 +125,7 @@
         100% { opacity: 1; }
       }
     </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
@@ -137,11 +137,9 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
   <body>
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
-  <script type="module" src="/index.tsx"></script>
-</body>
+  </body>
 </html>
