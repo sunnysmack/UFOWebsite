@@ -15,7 +15,7 @@ import { NavItem } from './types';
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'CLASSIFIED', href: '#origin' },
-  { label: 'PROTOCOLS', href: '#services' },
+  { label: 'OPERATIONS', href: '#services' },
   { label: 'TIMETRUCK', href: '#timetruck' },
   { label: 'AUDIO', href: '#audio' },
   { label: 'SECTOR SCAN', href: '#intelligence' },
@@ -360,7 +360,7 @@ const App: React.FC = () => {
                {/* Text is Black for contrast against White BG */}
                <div className="mb-8">
                 <ScrambleText 
-                  text="ORIGIN" 
+                  text="CLASSIFIED" 
                   as="h2" 
                   className="font-sans text-5xl md:text-7xl font-bold leading-[0.9] text-ufo-black lining-nums" 
                 />
@@ -410,7 +410,7 @@ const App: React.FC = () => {
         <section id="services" className="py-24 bg-ufo-black border-t border-ufo-gray/30">
           <div className="container mx-auto px-6">
             <RevealOnScroll className="mb-16">
-              <ScrambleText text="PROTOCOLS" as="h2" className="font-sans text-4xl md:text-6xl font-bold text-white mb-4" />
+              <ScrambleText text="OPERATIONS" as="h2" className="font-sans text-4xl md:text-6xl font-bold text-white mb-4" />
               <div className="w-full h-[1px] bg-ufo-gray opacity-30" />
             </RevealOnScroll>
 
