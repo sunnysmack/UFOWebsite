@@ -4,7 +4,6 @@ import NoiseOverlay from './components/NoiseOverlay';
 import RevealOnScroll from './components/RevealOnScroll';
 import ParallaxImage from './components/ParallaxImage';
 import TvStaticBackground from './components/TvStaticBackground';
-import RollingLogo from './components/RollingLogo';
 import ScrambleText from './components/ScrambleText';
 import Preloader from './components/Preloader';
 import VisualThreatAssessment from './components/VisualThreatAssessment';
@@ -161,18 +160,22 @@ const App: React.FC = () => {
           <TvStaticBackground />
           
           {/* Abstract Background Shapes - Now Gold - Lower opacity to blend with static */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-ufo-gray opacity-10 animate-[spin_60s_linear_infinite]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-dashed border-ufo-gray opacity-10 animate-[spin_40s_linear_infinite_reverse]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-ufo-gray opacity-[0.05] animate-[spin_60s_linear_infinite]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-dashed border-ufo-gray opacity-[0.05] animate-[spin_40s_linear_infinite_reverse]" />
           
           <RevealOnScroll className="z-10 text-center flex flex-col items-center justify-center w-full">
-            {/* Main Hero Logo - Updated to use logo.png */}
-            <RollingLogo className="w-[75vw] h-[75vw] md:w-[340px] md:h-[340px] mb-8">
+            {/* Main Hero Logo - New Levitation Animation */}
+            {/* Rounded-full applied to container and image to crop any square artifacts */}
+            <div className="relative mb-8 w-[75vw] h-[75vw] md:w-[340px] md:h-[340px] animate-levitate">
+                {/* Subtle back glow to integrate with background */}
+                <div className="absolute inset-0 bg-ufo-accent/5 rounded-full blur-2xl animate-pulse-slow" />
+                
                 <img 
                   src="/images/logo.png" 
                   alt="UFO Studios" 
-                  className="w-full h-full object-contain" 
+                  className="w-full h-full object-contain rounded-full relative z-10 drop-shadow-2xl" 
                 />
-            </RollingLogo>
+            </div>
           </RevealOnScroll>
 
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10">
@@ -199,6 +202,17 @@ const App: React.FC = () => {
           @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
+          }
+          /* New Levitate Animation */
+          @keyframes levitate {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+          }
+          .animate-levitate {
+            animation: levitate 6s ease-in-out infinite;
+          }
+          .animate-pulse-slow {
+             animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
           }
         `}</style>
 
