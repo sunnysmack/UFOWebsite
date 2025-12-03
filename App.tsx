@@ -146,6 +146,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const checkKey = async () => {
         try {
+            console.log("Checking for AI Studio environment...");
             const win = window as any;
             if (win.aistudio) {
                 const has = await win.aistudio.hasSelectedApiKey();
@@ -161,6 +162,14 @@ const App: React.FC = () => {
     };
     checkKey();
   }, []);
+
+  // Preloader Safety Timeout - Ensures app loads even if animations hang
+  useEffect(() => {
+    const timer = setTimeout(() => {
+        if (loading) setLoading(false);
+    }, 8000); // Force load after 8 seconds
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   const handleKeySelection = async () => {
       const win = window as any;
@@ -332,7 +341,7 @@ const App: React.FC = () => {
       {/* Fullscreen Image Modal - Updated with Frame and Navigation */}
       {fullscreenIndex !== null && (
         <div 
-          className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300"
+          className="fixed inset-0 z-[10000] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300"
           onClick={closeFullscreen}
         >
            {/* Main Container */}
@@ -469,7 +478,7 @@ const App: React.FC = () => {
           <div className="container mx-auto px-6 flex justify-between items-center">
             {/* Header Text - Just "UFO" in new font */}
             <a href="#" className="font-logo text-3xl tracking-tighter hover:text-ufo-accent transition-colors">
-             THE UFO
+             UFO TERMINAL
             </a>
 
             {/* Desktop Nav */}
