@@ -145,12 +145,18 @@ const App: React.FC = () => {
   // Initial Key Check
   useEffect(() => {
     const checkKey = async () => {
-        const win = window as any;
-        if (win.aistudio) {
-            const has = await win.aistudio.hasSelectedApiKey();
-            setKeySelected(has);
-        } else {
-            setKeySelected(true); // Fallback for local
+        try {
+            const win = window as any;
+            if (win.aistudio) {
+                const has = await win.aistudio.hasSelectedApiKey();
+                setKeySelected(has);
+            } else {
+                setKeySelected(true); // Fallback for local
+            }
+        } catch (e) {
+            console.error("Initialization error:", e);
+            // Default to false so user is prompted to connect key if something failed
+            setKeySelected(false);
         }
     };
     checkKey();
@@ -381,8 +387,6 @@ const App: React.FC = () => {
                                 className="max-h-[70vh] max-w-[85vw] md:max-w-[70vw] object-contain" 
                               />
                           )}
-                          
-                          {/* REMOVED SCANLINES DIV HERE */}
                       </div>
 
                       {/* Label on Frame */}
