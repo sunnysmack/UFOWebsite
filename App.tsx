@@ -70,7 +70,7 @@ const imageUrlToBase64 = async (url: string): Promise<string> => {
 };
 
 // Interactive Service Card Component
-const ServiceItem = ({ service, index }: { service: any, index: number }) => {
+const ServiceItem: React.FC<{ service: any, index: number }> = ({ service, index }) => {
   const [active, setActive] = useState(false);
 
   const triggerStatic = () => {
