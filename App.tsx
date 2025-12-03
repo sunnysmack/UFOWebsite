@@ -683,7 +683,7 @@ const App: React.FC = () => {
               ))}
             </div>
           </div>
-        </section>
+        </section> 
 
         {/* TIMETRUCK */}
         <TimeTruck />
