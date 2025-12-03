@@ -12,6 +12,7 @@ import Timetruck from './components/Timetruck';
 import SunnysmackAudio from './components/SunnysmackAudio';
 import CrackedScreenOverlay from './components/CrackedScreenOverlay';
 import { NavItem } from './types';
+import { animateImage } from './services/geminiService';
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'ART FILES', href: '#origin' },
@@ -55,6 +56,18 @@ const STATIC_ASSETS = [
     '/images/album5.jpg',
     '/images/album6.jpg'
 ];
+
+// Helper to convert image URL to base64 for API
+const imageUrlToBase64 = async (url: string): Promise<string> => {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
 
 // Interactive Service Card Component
 const ServiceItem = ({ service, index }: { service: any, index: number }) => {
@@ -100,6 +113,7 @@ const ServiceItem = ({ service, index }: { service: any, index: number }) => {
 };
 
 const App: React.FC = () => {
+  const [keySelected, setKeySelected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -109,6 +123,10 @@ const App: React.FC = () => {
   
   // Fullscreen Image State (Index based now)
   const [fullscreenIndex, setFullscreenIndex] = useState<number | null>(null);
+
+  // Animation State
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
 
   // Ref and state for the lighting transition on the Origin section
   const originRef = useRef<HTMLDivElement>(null);
@@ -123,6 +141,34 @@ const App: React.FC = () => {
     ...STATIC_ASSETS,
     ...reelItems.map(item => item.image)
   ]);
+
+  // Initial Key Check
+  useEffect(() => {
+    const checkKey = async () => {
+        const win = window as any;
+        if (win.aistudio) {
+            const has = await win.aistudio.hasSelectedApiKey();
+            setKeySelected(has);
+        } else {
+            setKeySelected(true); // Fallback for local
+        }
+    };
+    checkKey();
+  }, []);
+
+  const handleKeySelection = async () => {
+      const win = window as any;
+      if (win.aistudio) {
+          try {
+             await win.aistudio.openSelectKey();
+             // Assume success after modal closes/resolves
+             setKeySelected(true);
+          } catch (e) {
+             console.error("Key selection failed", e);
+             setKeySelected(false);
+          }
+      }
+  };
 
   const handleReelChange = (index: number) => {
     if (reelItems[index]) {
@@ -139,16 +185,50 @@ const App: React.FC = () => {
   };
 
   // Fullscreen Navigation Logic
-  const closeFullscreen = () => setFullscreenIndex(null);
+  const resetAnimation = () => {
+      setGeneratedVideoUrl(null);
+      setIsAnimating(false);
+  };
+
+  const closeFullscreen = () => {
+      setFullscreenIndex(null);
+      resetAnimation();
+  };
   
   const nextImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
+    resetAnimation();
     setFullscreenIndex(prev => prev !== null ? (prev + 1) % reelItems.length : null);
   };
 
   const prevImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
+    resetAnimation();
     setFullscreenIndex(prev => prev !== null ? (prev - 1 + reelItems.length) % reelItems.length : null);
+  };
+
+  const handleAnimate = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (fullscreenIndex === null || isAnimating) return;
+
+    setIsAnimating(true);
+    try {
+        const currentSrc = reelItems[fullscreenIndex].image;
+        const base64 = await imageUrlToBase64(currentSrc);
+        const videoUrl = await animateImage(base64);
+        setGeneratedVideoUrl(videoUrl);
+    } catch (error: any) {
+        console.error("Animation failed", error);
+        if (error.message && error.message.includes("Requested entity was not found")) {
+            // Key might be invalid or project not billed
+            alert("TRANSMISSION ERROR: API Key requires a billed project for Veo.");
+            setKeySelected(false); // Force re-selection
+        } else {
+            alert("TRANSMISSION ERROR: Could not animate subject.");
+        }
+    } finally {
+        setIsAnimating(false);
+    }
   };
 
   // Keyboard navigation for gallery
@@ -194,6 +274,45 @@ const App: React.FC = () => {
     setMenuOpen(!menuOpen);
   };
 
+  // --- API KEY GATE UI ---
+  if (!keySelected) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-6 font-mono overflow-hidden relative">
+            <div className="absolute inset-0 pointer-events-none opacity-20">
+                <TvStaticBackground />
+            </div>
+            
+            <div className="max-w-md w-full text-center border border-ufo-gray bg-black/90 p-8 relative z-10 animate-in fade-in zoom-in duration-500">
+                <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-ufo-accent" />
+                <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-ufo-accent" />
+                <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-ufo-accent" />
+                <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-ufo-accent" />
+                
+                <h1 className="text-2xl font-bold mb-2 text-ufo-accent">SECURE UPLINK REQUIRED</h1>
+                <div className="w-full h-px bg-ufo-gray my-4" />
+                <p className="text-sm text-gray-400 mb-8 leading-relaxed">
+                    To access the UFO Studios mainframe and Veo video generation, a valid API key with a billed project is required.
+                </p>
+                
+                <button 
+                onClick={handleKeySelection}
+                className="w-full bg-ufo-accent text-black px-6 py-4 font-bold tracking-widest hover:bg-white transition-colors uppercase mb-6 flex items-center justify-center gap-2"
+                >
+                    <span className="w-2 h-2 bg-black animate-pulse rounded-full" />
+                    Connect API Key
+                </button>
+                
+                <div className="text-[10px] text-gray-600 border-t border-ufo-gray/30 pt-4">
+                    NOTE: Veo models require a paid GCP project.<br/>
+                    <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" rel="noreferrer" className="underline hover:text-white transition-colors">
+                        Read Billing Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+      );
+  }
+
   return (
     <>
       {loading && (
@@ -211,14 +330,23 @@ const App: React.FC = () => {
           onClick={closeFullscreen}
         >
            {/* Main Container */}
-           <div className="flex items-center justify-center w-full h-full p-4 md:p-10 gap-4">
+           <div className="flex items-center justify-center w-full h-full p-4 md:p-10 gap-4 md:gap-12">
               
-              {/* Previous Button (Hidden on tiny screens, can use tap/swipe later if needed, mostly for desktop/tablet) */}
+              {/* Unique Previous Button */}
               <button 
                 onClick={prevImage}
-                className="hidden md:flex flex-col items-center justify-center w-12 h-24 border border-ufo-gray hover:bg-white hover:text-black hover:border-white transition-all text-white font-mono text-2xl z-50"
+                className="hidden md:flex flex-col items-center justify-center group z-50 transition-all duration-300 hover:-translate-x-2"
               >
-                &lt;
+                <div className="w-16 h-16 border border-ufo-gray bg-black/50 backdrop-blur-md relative flex items-center justify-center group-hover:border-ufo-accent group-hover:bg-ufo-accent/10 transition-colors">
+                    {/* Tech Corners */}
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-ufo-gray group-hover:border-ufo-accent" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-ufo-gray group-hover:border-ufo-accent" />
+                    
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-8 h-8 text-white group-hover:text-ufo-accent">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
+                    </svg>
+                </div>
+                <span className="font-mono text-[10px] text-ufo-gray mt-2 tracking-widest group-hover:text-ufo-accent">PREV_FILE</span>
               </button>
 
               {/* Framed Image Container */}
@@ -227,17 +355,34 @@ const App: React.FC = () => {
                  onClick={(e) => e.stopPropagation()}
                >
                   {/* The Frame */}
-                  <div className="bg-white p-2 md:p-4 pb-12 md:pb-16 shadow-[0_0_50px_rgba(0,0,0,0.8)] rotate-1 transform transition-transform hover:rotate-0 duration-500">
+                  <div className="bg-white p-2 md:p-4 pb-16 md:pb-20 shadow-[0_0_80px_rgba(0,0,0,0.8)] rotate-1 transform transition-transform hover:rotate-0 duration-500 relative">
                       
                       {/* Inner Image Wrapper */}
                       <div className="relative bg-black overflow-hidden border border-gray-200">
-                          <img 
-                            src={reelItems[fullscreenIndex].image} 
-                            alt="Evidence" 
-                            className="max-h-[70vh] max-w-[85vw] md:max-w-[70vw] object-contain" 
-                          />
-                          {/* Permanent Scanlines on Fullscreen too */}
-                          <div className="absolute inset-0 pointer-events-none z-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.2)_50%)] bg-[length:100%_4px]" />
+                          {isAnimating && (
+                              <div className="absolute inset-0 z-20 bg-black/80 flex flex-col items-center justify-center">
+                                  <div className="w-16 h-16 border-t-2 border-ufo-accent rounded-full animate-spin mb-4" />
+                                  <span className="font-mono text-ufo-accent text-xs blink tracking-widest">PROCESSING VEO SEQUENCE...</span>
+                              </div>
+                          )}
+                          
+                          {generatedVideoUrl ? (
+                              <video 
+                                src={generatedVideoUrl} 
+                                autoPlay 
+                                loop 
+                                playsInline
+                                className="max-h-[70vh] max-w-[85vw] md:max-w-[70vw] object-contain"
+                              />
+                          ) : (
+                              <img 
+                                src={reelItems[fullscreenIndex].image} 
+                                alt="Evidence" 
+                                className="max-h-[70vh] max-w-[85vw] md:max-w-[70vw] object-contain" 
+                              />
+                          )}
+                          
+                          {/* REMOVED SCANLINES DIV HERE */}
                       </div>
 
                       {/* Label on Frame */}
@@ -246,8 +391,26 @@ const App: React.FC = () => {
                              <span className="block text-[10px] uppercase tracking-widest opacity-50">EVIDENCE #{fullscreenIndex + 100}</span>
                              <span className="text-xs md:text-sm font-bold tracking-tighter">PROJECT: FINGERPAINT</span>
                           </div>
-                          <div className="text-[10px] opacity-40">
-                             CONFIDENTIAL
+                          
+                          {/* Control Panel in Frame Footer */}
+                          <div className="flex items-center gap-4">
+                              {!generatedVideoUrl && !isAnimating && (
+                                  <button 
+                                    onClick={handleAnimate}
+                                    className="border border-black/20 px-3 py-1 text-[10px] tracking-widest hover:bg-black hover:text-white transition-all uppercase flex items-center gap-2 group/btn"
+                                  >
+                                    <span className="w-2 h-2 rounded-full bg-red-500 group-hover/btn:animate-ping" />
+                                    Initialize Animation
+                                  </button>
+                              )}
+                              {generatedVideoUrl && (
+                                   <div className="text-[10px] text-red-600 font-bold animate-pulse tracking-widest">
+                                       ● LIVE PLAYBACK
+                                   </div>
+                              )}
+                              <div className="text-[10px] opacity-40">
+                                 CONFIDENTIAL
+                              </div>
                           </div>
                       </div>
 
@@ -256,12 +419,21 @@ const App: React.FC = () => {
                   </div>
               </div>
 
-              {/* Next Button */}
+              {/* Unique Next Button */}
               <button 
                 onClick={nextImage}
-                className="hidden md:flex flex-col items-center justify-center w-12 h-24 border border-ufo-gray hover:bg-white hover:text-black hover:border-white transition-all text-white font-mono text-2xl z-50"
+                className="hidden md:flex flex-col items-center justify-center group z-50 transition-all duration-300 hover:translate-x-2"
               >
-                &gt;
+                <div className="w-16 h-16 border border-ufo-gray bg-black/50 backdrop-blur-md relative flex items-center justify-center group-hover:border-ufo-accent group-hover:bg-ufo-accent/10 transition-colors">
+                     {/* Tech Corners */}
+                    <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-ufo-gray group-hover:border-ufo-accent" />
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-ufo-gray group-hover:border-ufo-accent" />
+
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-8 h-8 text-white group-hover:text-ufo-accent">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                </div>
+                <span className="font-mono text-[10px] text-ufo-gray mt-2 tracking-widest group-hover:text-ufo-accent">NEXT_FILE</span>
               </button>
            </div>
 
