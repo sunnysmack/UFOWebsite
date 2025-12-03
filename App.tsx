@@ -8,7 +8,7 @@ import GyroTilt from './components/GyroTilt';
 import ScrambleText from './components/ScrambleText';
 import Preloader from './components/Preloader';
 import VisualThreatAssessment from './components/VisualThreatAssessment';
-import Timetruck from './components/Timetruck';
+import TimeTruck from './components/TimeTruck';
 import SunnysmackAudio from './components/SunnysmackAudio';
 import CrackedScreenOverlay from './components/CrackedScreenOverlay';
 import { NavItem } from './types';
