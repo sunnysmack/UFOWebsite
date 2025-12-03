@@ -4,16 +4,16 @@ import ScrambleText from './ScrambleText';
 
 // REPLACE THESE WITH YOUR ACTUAL YOUTUBE VIDEO IDs
 const ARCHIVES = [
-  { id: 'TIyO2eviekc', title: 'TI: The Tesla Files', date: '1987.10.24' },
-  { id: 'ZuyW_caXI1o', title: 'TII: Command Decision II', date: '1988.01.12' },
-  { id: 'asVBKzcwOOU', title: 'TIII: Donny Tarriffs', date: '1989.03.15' },
-  { id: '8NGlSQvP8LI', title: 'TIV: Make America Groovy', date: '1990.06.20' },
-  { id: 'VfGSWOCpJQc', title: 'TV: The Breakout', date: '1991.09.02' },
-  { id: 'HfCIu9o7WFw', title: 'TVI: Fort Knox', date: '1992.11.11' },
-  { id: 'Yse7CvXtXs8', title: 'TVII: The Basement', date: '1993.12.25' },
-  { id: '', title: 'MISSING TVIII', date: '1994.02.14' },
-  { id: '', title: 'MISSING TIX: Nikola Telsa', date: '1995.05.05' },
-  { id: '', title: 'MISSING TX: Butler', date: '1996.07.07' },
+  { id: 'TIyO2eviekc', title: 'T1: The Tesla Files', date: '1987.10.24' },
+  { id: 'ZuyW_caXI1o', title: 'T2: Command Decision II', date: '1988.01.12' },
+  { id: 'asVBKzcwOOU', title: 'T3: Donny Tarriffs', date: '1989.03.15' },
+  { id: '8NGlSQvP8LI', title: 'T4 Make America Groovy', date: '1990.06.20' },
+  { id: 'VfGSWOCpJQc', title: 'T5: The Breakout', date: '1991.09.02' },
+  { id: 'HfCIu9o7WFw', title: 'T6: Fort Knox', date: '1992.11.11' },
+  { id: 'Yse7CvXtXs8', title: 'T7: The Basement', date: '1993.12.25' },
+  { id: '', title: 'MISSING T8: Coins', date: '1994.02.14' },
+  { id: '', title: 'MISSING T9: Nikola Telsa', date: '1995.05.05' },
+  { id: '', title: 'MISSING T10: Butler', date: '1996.07.07' },
   { id: '', title: 'LAST TRANSMISSION', date: '2025.12.25' },
 ];
 
