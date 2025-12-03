@@ -4,17 +4,16 @@ import ScrambleText from './ScrambleText';
 
 // REPLACE THESE WITH YOUR ACTUAL YOUTUBE VIDEO IDs
 const ARCHIVES = [
-  // Updated the first one with your provided ID: TIyO2eviekc
-  { id: 'TIyO2eviekc', title: 'T1: The Tesla Files', date: '1987.10.24' },
-  { id: 'ZuyW_caXI1o', title: 'T2: Command Decision II', date: '1988.01.12' },
-  { id: 'asVBKzcwOOU', title: 'T3: Donny Tarriffs', date: '1989.03.15' },
-  { id: '8NGlSQvP8LI', title: 'T4 Make America Groovy', date: '1990.06.20' },
-  { id: 'VfGSWOCpJQc', title: 'T5: The Breakout', date: '1991.09.02' },
-  { id: 'HfCIu9o7WFw', title: 'T6: Fort Knox', date: '1992.11.11' },
-  { id: 'Yse7CvXtXs8', title: 'T7:  The Basement', date: '1993.12.25' },
-  { id: '', title: 'MISSING T8: Coins', date: '1994.02.14' },
-  { id: '', title: 'MISSING T9: Nikola Telsa', date: '1995.05.05' },
-  { id: '', title: 'MISSING T10: Butler', date: '1996.07.07' },
+  { id: 'TIyO2eviekc', title: 'TI: The Tesla Files', date: '1987.10.24' },
+  { id: 'ZuyW_caXI1o', title: 'TII: Command Decision II', date: '1988.01.12' },
+  { id: 'asVBKzcwOOU', title: 'TIII: Donny Tarriffs', date: '1989.03.15' },
+  { id: '8NGlSQvP8LI', title: 'TIV: Make America Groovy', date: '1990.06.20' },
+  { id: 'VfGSWOCpJQc', title: 'TV: The Breakout', date: '1991.09.02' },
+  { id: 'HfCIu9o7WFw', title: 'TVI: Fort Knox', date: '1992.11.11' },
+  { id: 'Yse7CvXtXs8', title: 'TVII: The Basement', date: '1993.12.25' },
+  { id: '', title: 'MISSING TVIII', date: '1994.02.14' },
+  { id: '', title: 'MISSING TIX: Nikola Telsa', date: '1995.05.05' },
+  { id: '', title: 'MISSING TX: Butler', date: '1996.07.07' },
   { id: '', title: 'LAST TRANSMISSION', date: '2025.12.25' },
 ];
 
@@ -63,8 +62,8 @@ const Timetruck: React.FC = () => {
       </div>
 
       <div className="container mx-auto relative z-10">
-        {/* Header */}
-        <RevealOnScroll className="mb-16 flex flex-col md:flex-row md:items-end justify-between border-b border-ufo-gray/50 pb-8 gap-4">
+        {/* Header - Reduced margin bottom from mb-16 to mb-8 */}
+        <RevealOnScroll className="mb-8 flex flex-col md:flex-row md:items-end justify-between border-b border-ufo-gray/50 pb-8 gap-4">
           <div>
             <ScrambleText text="TIMETRUCK ARCHIVES" as="h2" className="font-sans text-4xl md:text-6xl font-bold" />
             <p className="font-mono text-xs text-ufo-accent mt-2">TEMPORAL TRANSMISSION LOGS</p>
@@ -79,40 +78,50 @@ const Timetruck: React.FC = () => {
           {ARCHIVES.map((video, idx) => (
             <RevealOnScroll key={idx} delay={idx * 50} threshold={0.1}>
               <div 
-                className="group relative cursor-pointer bg-black border border-ufo-gray hover:border-ufo-accent transition-colors duration-300"
-                onClick={() => setActiveVideo(video.id)}
+                className={`group relative border transition-colors duration-300 ${video.id ? 'cursor-pointer bg-black border-ufo-gray hover:border-ufo-accent' : 'cursor-not-allowed bg-black/50 border-ufo-gray/30'}`}
+                onClick={() => video.id && setActiveVideo(video.id)}
               >
                 {/* Thumbnail Container */}
-                <div className="aspect-video relative overflow-hidden opacity-80 group-hover:opacity-100 transition-opacity">
-                   <img 
-                    src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`} 
-                    alt={video.title}
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105"
-                   />
-                   
-                   {/* Overlay Scanlines */}
-                   <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.4)_50%)] bg-[length:100%_4px] pointer-events-none" />
-                   
-                   {/* Play Button Overlay */}
-                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
-                      <div className="w-12 h-12 border border-ufo-accent flex items-center justify-center rounded-full bg-ufo-accent/10 backdrop-blur-sm">
-                        <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[12px] border-l-ufo-accent border-b-[6px] border-b-transparent ml-1" />
-                      </div>
-                   </div>
+                <div className="aspect-video relative overflow-hidden">
+                   {video.id ? (
+                     <>
+                        <img 
+                          src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`} 
+                          alt={video.title}
+                          className="w-full h-full object-cover grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-500 transform group-hover:scale-105"
+                        />
+                        {/* Overlay Scanlines */}
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0)_50%,rgba(0,0,0,0.4)_50%)] bg-[length:100%_4px] pointer-events-none" />
+                        
+                        {/* Play Button Overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
+                            <div className="w-12 h-12 border border-ufo-accent flex items-center justify-center rounded-full bg-ufo-accent/10 backdrop-blur-sm">
+                              <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[12px] border-l-ufo-accent border-b-[6px] border-b-transparent ml-1" />
+                            </div>
+                        </div>
+                     </>
+                   ) : (
+                     // Missing Video State
+                     <div className="w-full h-full flex flex-col items-center justify-center bg-[#111] text-ufo-gray p-4">
+                        <div className="text-4xl mb-2 opacity-50">⚠</div>
+                        <span className="font-mono text-xs tracking-widest uppercase">Data Corrupted</span>
+                        <span className="font-mono text-[10px] mt-1 opacity-50">Log Missing</span>
+                     </div>
+                   )}
                 </div>
 
                 {/* Metadata */}
-                <div className="p-4 border-t border-ufo-gray group-hover:border-ufo-accent transition-colors relative">
+                <div className={`p-4 border-t transition-colors relative ${video.id ? 'border-ufo-gray group-hover:border-ufo-accent' : 'border-ufo-gray/30'}`}>
                    <div className="flex justify-between items-start mb-2">
-                     <span className="font-mono text-[10px] text-ufo-accent">{video.date}</span>
+                     <span className={`font-mono text-[10px] ${video.id ? 'text-ufo-accent' : 'text-gray-600'}`}>{video.date}</span>
                      <span className="font-mono text-[10px] text-gray-500">FILE_{String(idx + 1).padStart(3, '0')}</span>
                    </div>
-                   <h3 className="font-sans text-sm font-bold text-gray-300 group-hover:text-white truncate pr-4">
+                   <h3 className={`font-sans text-sm font-bold truncate pr-4 ${video.id ? 'text-gray-300 group-hover:text-white' : 'text-gray-700'}`}>
                      {video.title}
                    </h3>
                    
                    {/* Corner decoration */}
-                   <div className="absolute bottom-0 right-0 w-2 h-2 bg-ufo-gray group-hover:bg-ufo-accent transition-colors" />
+                   {video.id && <div className="absolute bottom-0 right-0 w-2 h-2 bg-ufo-gray group-hover:bg-ufo-accent transition-colors" />}
                 </div>
               </div>
             </RevealOnScroll>
