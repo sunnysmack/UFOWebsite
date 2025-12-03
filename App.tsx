@@ -686,7 +686,7 @@ const App: React.FC = () => {
         </section>
 
         {/* TIMETRUCK */}
-        <Timetruck />
+        <TimeTruck />
 
         {/* AUDIO */}
         <SunnysmackAudio />
