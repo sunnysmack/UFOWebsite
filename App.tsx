@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Component, ErrorInfo } from 'react';
 import CustomCursor from './components/CustomCursor';
 import NoiseOverlay from './components/NoiseOverlay';
 import RevealOnScroll from './components/RevealOnScroll';
@@ -8,16 +8,49 @@ import GyroTilt from './components/GyroTilt';
 import ScrambleText from './components/ScrambleText';
 import Preloader from './components/Preloader';
 import VisualThreatAssessment from './components/VisualThreatAssessment';
-import TimeTruck from './components/TimeTruck';
+import TimeTruck from './components/Timetruck';
 import SunnysmackAudio from './components/SunnysmackAudio';
 import CrackedScreenOverlay from './components/CrackedScreenOverlay';
 import { NavItem } from './types';
-import { animateImage } from './services/geminiService';
+
+// --- Error Boundary to catch render crashes ---
+class ErrorBoundary extends Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Critical System Failure:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-black text-red-500 font-mono flex flex-col items-center justify-center p-8 text-center">
+          <h1 className="text-4xl mb-4 border-b border-red-500 pb-2">CRITICAL SYSTEM FAILURE</h1>
+          <p className="mb-8">{this.state.error?.message || "Unknown Error"}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="border border-red-500 px-6 py-3 hover:bg-red-500 hover:text-black transition-colors"
+          >
+            INITIATE SYSTEM REBOOT
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'ART FILES', href: '#origin' },
   { label: 'PROTOCOLS', href: '#services' },
-  { label: 'TIMETRUCK', href: '#timetruck' },
+  { label: 'TimeTruck', href: '#timetruck' },
   { label: 'AUDIO', href: '#audio' },
   { label: 'SECTOR SCAN', href: '#intelligence' },
   { label: 'COMMS', href: '#contact' }
@@ -56,18 +89,6 @@ const STATIC_ASSETS = [
     '/images/album5.jpg',
     '/images/album6.jpg'
 ];
-
-// Helper to convert image URL to base64 for API
-const imageUrlToBase64 = async (url: string): Promise<string> => {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
 
 // Interactive Service Card Component
 const ServiceItem: React.FC<{ service: any, index: number }> = ({ service, index }) => {
@@ -112,7 +133,7 @@ const ServiceItem: React.FC<{ service: any, index: number }> = ({ service, index
   );
 };
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const [keySelected, setKeySelected] = useState(false);
   const [loading, setLoading] = useState(true);
   const [scrolled, setScrolled] = useState(false);
@@ -123,14 +144,6 @@ const App: React.FC = () => {
   
   // Fullscreen Image State (Index based now)
   const [fullscreenIndex, setFullscreenIndex] = useState<number | null>(null);
-
-  // Animation State
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
-
-  // Ref and state for the lighting transition on the Origin section
-  const originRef = useRef<HTMLDivElement>(null);
-  const [originVisible, setOriginVisible] = useState(false);
 
   // Initialize reel items once on load so we can preload them
   const [reelItems] = useState(() => generateReel());
@@ -156,7 +169,6 @@ const App: React.FC = () => {
             }
         } catch (e) {
             console.error("Initialization error:", e);
-            // Default to false so user is prompted to connect key if something failed
             setKeySelected(false);
         }
     };
@@ -176,7 +188,6 @@ const App: React.FC = () => {
       if (win.aistudio) {
           try {
              await win.aistudio.openSelectKey();
-             // Assume success after modal closes/resolves
              setKeySelected(true);
           } catch (e) {
              console.error("Key selection failed", e);
@@ -187,7 +198,7 @@ const App: React.FC = () => {
 
   const handleReelChange = (index: number) => {
     if (reelItems[index]) {
-        if (navigator.vibrate) navigator.vibrate(5); // Tiny tick on scroll
+        if (navigator.vibrate) navigator.vibrate(5);
         setCurrentEvidenceLabel(reelItems[index].label);
     }
   };
@@ -200,50 +211,18 @@ const App: React.FC = () => {
   };
 
   // Fullscreen Navigation Logic
-  const resetAnimation = () => {
-      setGeneratedVideoUrl(null);
-      setIsAnimating(false);
-  };
-
   const closeFullscreen = () => {
       setFullscreenIndex(null);
-      resetAnimation();
   };
   
   const nextImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    resetAnimation();
     setFullscreenIndex(prev => prev !== null ? (prev + 1) % reelItems.length : null);
   };
 
   const prevImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    resetAnimation();
     setFullscreenIndex(prev => prev !== null ? (prev - 1 + reelItems.length) % reelItems.length : null);
-  };
-
-  const handleAnimate = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (fullscreenIndex === null || isAnimating) return;
-
-    setIsAnimating(true);
-    try {
-        const currentSrc = reelItems[fullscreenIndex].image;
-        const base64 = await imageUrlToBase64(currentSrc);
-        const videoUrl = await animateImage(base64);
-        setGeneratedVideoUrl(videoUrl);
-    } catch (error: any) {
-        console.error("Animation failed", error);
-        if (error.message && error.message.includes("Requested entity was not found")) {
-            // Key might be invalid or project not billed
-            alert("TRANSMISSION ERROR: API Key requires a billed project for Veo.");
-            setKeySelected(false); // Force re-selection
-        } else {
-            alert("TRANSMISSION ERROR: Could not animate subject.");
-        }
-    } finally {
-        setIsAnimating(false);
-    }
   };
 
   // Keyboard navigation for gallery
@@ -258,7 +237,6 @@ const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [fullscreenIndex]);
 
-
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -267,23 +245,6 @@ const App: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setOriginVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.2 } // Trigger when 20% visible
-    );
-    
-    if (originRef.current) {
-      observer.observe(originRef.current);
-    }
-    return () => observer.disconnect();
-  }, []);
-
   const toggleMenu = () => {
     if (navigator.vibrate) navigator.vibrate(10);
     setMenuOpen(!menuOpen);
@@ -306,7 +267,7 @@ const App: React.FC = () => {
                 <h1 className="text-2xl font-bold mb-2 text-ufo-accent">SECURE UPLINK REQUIRED</h1>
                 <div className="w-full h-px bg-ufo-gray my-4" />
                 <p className="text-sm text-gray-400 mb-8 leading-relaxed">
-                    To access the UFO Studios mainframe and Veo video generation, a valid API key with a billed project is required.
+                    To access the UFO Studios mainframe, a valid API key is required.
                 </p>
                 
                 <button 
@@ -316,13 +277,6 @@ const App: React.FC = () => {
                     <span className="w-2 h-2 bg-black animate-pulse rounded-full" />
                     Connect API Key
                 </button>
-                
-                <div className="text-[10px] text-gray-600 border-t border-ufo-gray/30 pt-4">
-                    NOTE: Veo models require a paid GCP project.<br/>
-                    <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" rel="noreferrer" className="underline hover:text-white transition-colors">
-                        Read Billing Documentation
-                    </a>
-                </div>
             </div>
         </div>
       );
@@ -338,7 +292,7 @@ const App: React.FC = () => {
       )}
       {isCracked && <CrackedScreenOverlay onComplete={() => setIsCracked(false)} />}
       
-      {/* Fullscreen Image Modal - Updated with Frame and Navigation */}
+      {/* Fullscreen Image Modal - Static Image Only */}
       {fullscreenIndex !== null && (
         <div 
           className="fixed inset-0 z-[10000] bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in duration-300"
@@ -374,28 +328,11 @@ const App: React.FC = () => {
                       
                       {/* Inner Image Wrapper */}
                       <div className="relative bg-black overflow-hidden border border-gray-200">
-                          {isAnimating && (
-                              <div className="absolute inset-0 z-20 bg-black/80 flex flex-col items-center justify-center">
-                                  <div className="w-16 h-16 border-t-2 border-ufo-accent rounded-full animate-spin mb-4" />
-                                  <span className="font-mono text-ufo-accent text-xs blink tracking-widest">PROCESSING VEO SEQUENCE...</span>
-                              </div>
-                          )}
-                          
-                          {generatedVideoUrl ? (
-                              <video 
-                                src={generatedVideoUrl} 
-                                autoPlay 
-                                loop 
-                                playsInline
-                                className="max-h-[70vh] max-w-[85vw] md:max-w-[70vw] object-contain"
-                              />
-                          ) : (
-                              <img 
-                                src={reelItems[fullscreenIndex].image} 
-                                alt="Evidence" 
-                                className="max-h-[70vh] max-w-[85vw] md:max-w-[70vw] object-contain" 
-                              />
-                          )}
+                          <img 
+                            src={reelItems[fullscreenIndex].image} 
+                            alt="Evidence" 
+                            className="max-h-[70vh] max-w-[85vw] md:max-w-[70vw] object-contain" 
+                          />
                       </div>
 
                       {/* Label on Frame */}
@@ -405,22 +342,8 @@ const App: React.FC = () => {
                              <span className="text-xs md:text-sm font-bold tracking-tighter">PROJECT: FINGERPAINT</span>
                           </div>
                           
-                          {/* Control Panel in Frame Footer */}
+                          {/* Footer Info */}
                           <div className="flex items-center gap-4">
-                              {!generatedVideoUrl && !isAnimating && (
-                                  <button 
-                                    onClick={handleAnimate}
-                                    className="border border-black/20 px-3 py-1 text-[10px] tracking-widest hover:bg-black hover:text-white transition-all uppercase flex items-center gap-2 group/btn"
-                                  >
-                                    <span className="w-2 h-2 rounded-full bg-red-500 group-hover/btn:animate-ping" />
-                                    Initialize Animation
-                                  </button>
-                              )}
-                              {generatedVideoUrl && (
-                                   <div className="text-[10px] text-red-600 font-bold animate-pulse tracking-widest">
-                                       ● LIVE PLAYBACK
-                                   </div>
-                              )}
                               <div className="text-[10px] opacity-40">
                                  CONFIDENTIAL
                               </div>
@@ -476,9 +399,9 @@ const App: React.FC = () => {
         {/* Navigation */}
         <nav className={`fixed top-0 w-full z-40 transition-all duration-300 mix-blend-difference ${scrolled ? 'py-4' : 'py-8'}`}>
           <div className="container mx-auto px-6 flex justify-between items-center">
-            {/* Header Text - Just "UFO" in new font */}
+            {/* Header Text */}
             <a href="#" className="font-logo text-3xl tracking-tighter hover:text-ufo-accent transition-colors">
-             UFO TERMINAL
+             THE UFO
             </a>
 
             {/* Desktop Nav */}
@@ -615,11 +538,10 @@ const App: React.FC = () => {
           }
         `}</style>
 
-        {/* ORIGIN (ABOUT) - Modified for White BG + Lighting Transition */}
+        {/* ORIGIN (ABOUT) - Fixed Visibility */}
         <section 
           id="origin" 
-          ref={originRef}
-          className={`min-h-screen flex items-center py-20 px-6 bg-white transition-opacity duration-75 ${originVisible ? 'animate-flicker-on opacity-100' : 'opacity-0'}`}
+          className="min-h-screen flex items-center py-20 px-6 bg-white"
         >
           <div className="container mx-auto grid md:grid-cols-2 gap-16 items-center">
             <RevealOnScroll>
@@ -683,7 +605,7 @@ const App: React.FC = () => {
               ))}
             </div>
           </div>
-        </section> 
+        </section>
 
         {/* TIMETRUCK */}
         <TimeTruck />
@@ -751,6 +673,15 @@ const App: React.FC = () => {
 
       </div>
     </>
+  );
+};
+
+// Top-level app component wrapping content in ErrorBoundary
+const App: React.FC = () => {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
   );
 };
 
