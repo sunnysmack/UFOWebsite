@@ -28,11 +28,13 @@ const CrackedScreenOverlay: React.FC<CrackedScreenProps> = ({ onComplete }) => {
     };
   }, [onComplete]);
 
-  // Image cycling effect for "ts1.jpg" through "ts27.jpg"
+  // Image cycling effect using existing asset patterns
   useEffect(() => {
     const interval = setInterval(() => {
-      // Randomly pick an image between 1 and 27
-      const num = Math.floor(Math.random() * 27) + 1;
+      // Use the known image range from generateReel (72-158) to ensure files exist
+      const min = 72;
+      const max = 158;
+      const num = Math.floor(Math.random() * (max - min + 1)) + min;
       setCurrentImg(num);
     }, 60); // 60ms = ~16fps, very fast/glitchy
 
@@ -45,7 +47,7 @@ const CrackedScreenOverlay: React.FC<CrackedScreenProps> = ({ onComplete }) => {
       {/* 0. BACKGROUND IMAGE CYCLE - Glitchy Layer */}
       <div className={`absolute inset-0 z-20 transition-opacity duration-100 ${stage >= 1 ? 'opacity-60' : 'opacity-0'}`}>
          <img 
-            src={`/images/ts${currentImg}.jpg`} 
+            src={`/images/IMG_${currentImg.toString().padStart(4, '0')}.AVIF`} 
             alt="" 
             className="w-full h-full object-cover filter contrast-125 brightness-75 sepia-[.5] hue-rotate-15"
          />
